@@ -1,0 +1,15 @@
+
+a.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <Clear>:
+   0:	b8 00 80 0b 00       	mov    eax,0xb8000
+   5:	0f 1f 00             	nop    DWORD PTR [rax]
+   8:	c6 00 00             	mov    BYTE PTR [rax],0x0
+   b:	c6 40 01 0a          	mov    BYTE PTR [rax+0x1],0xa
+   f:	48 83 c0 02          	add    rax,0x2
+  13:	48 3d a0 8f 0b 00    	cmp    rax,0xb8fa0
+  19:	75 ed                	jne    8 <Clear+0x8>
+  1b:	f3 c3                	repz ret 
