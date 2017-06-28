@@ -9,7 +9,7 @@ jmp 0x07C0:START
 ;;;; CONFIG ;;;;;
 ;;;;;;;;;;;;;;;;;
 
-TOTALSECTOR: dw 1024 ;
+TOTALSECTOR: dw 1
 
 
 
@@ -101,7 +101,7 @@ BREAKREAD:
 ERRORHANDLER:
 	push DISKERROR
 	push 24
-	push 1
+	push 12
 	call PRINT
 	jmp $
 
