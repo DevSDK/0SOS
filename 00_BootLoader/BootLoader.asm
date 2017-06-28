@@ -9,7 +9,7 @@ jmp 0x07C0:START
 ;;;; CONFIG ;;;;;
 ;;;;;;;;;;;;;;;;;
 
-TOTALSECTOR: dw 1
+TOTALSECTOR: dw 2
 
 
 

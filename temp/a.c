@@ -7,7 +7,6 @@ int Add(int a, int b, int c)
 
 int main()
 {
-	int i;
-	i = Add(1,2,3);
+	Add(0,1,2);
+	return 0;
 }
-

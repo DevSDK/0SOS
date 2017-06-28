@@ -62,7 +62,7 @@ PROTECTEDMODE:
 	call PRINT
 	add  esp, 12
 
-	jmp $
+	jmp dword 0x08:0x10200		;Let's Jump To C
 
 PRINT:
 	push ebp
