@@ -1,6 +1,6 @@
 #include "Types.h"
 #include "Page.h"
-
+#include "SwitchMode.h"
 void PrintVideoMemory(int x, int y,BYTE Attribute, const char* _str);
 BOOL CheckMemorySize();
 BOOL Initalization64KernelMemoryArea();
@@ -31,10 +31,38 @@ void __Kernel__Entry()
 		while(1);
 	}
 
-	PrintVideoMemory(5,7, 0x0F,"Initalization PML4, PDPT, PD, PT ....................");
+	PrintVideoMemory(5,7, 0x0F,"Initalization PML4, PDPT, PD .........................");
 	InitializePageTable();
 	PrintVideoMemory(60,7,0x0A,"[SUCCESS]");
 	
+	
+	PrintVideoMemory(5,8, 0x0F,"CPU Company .......................................... [            ]");
+	
+	DWORD out_eax, out_ebx, out_ecx, out_edx;
+	GetCPUID(0x00000000, &out_eax, &out_ebx, &out_ecx, &out_edx);
+
+	char CPU_Name[13] = {0};
+	*( DWORD*)CPU_Name 		= out_ebx;
+	*((DWORD*)CPU_Name+1)	= out_edx;
+	*((DWORD*)CPU_Name+2)	= out_ecx;
+
+	PrintVideoMemory(61,8, 0x0F, CPU_Name);
+		
+	GetCPUID(0x80000001, &out_eax, &out_ebx, &out_ecx, &out_edx);
+	PrintVideoMemory(5,9, 0x0F,"Check CPU Support 64Bit ..............................");
+	if(out_edx & ( 1 << 29))
+	{	
+		PrintVideoMemory(60,9,0x0A,"[SUCCESS]");
+	}
+	else
+	{	
+		PrintVideoMemory(60,9,0x0C,"[ERROR]");
+		while(1);
+	}
+	
+	PrintVideoMemory(5,10, 0x0F,"Now 64 Bit Mode.");
+	ModeSwitchAndJumpKernel64();
+		
 	while(1);
 }
 

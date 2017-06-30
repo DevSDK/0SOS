@@ -29,6 +29,10 @@ void InitializePageTable()
 
 	DWORD LowMapping = 0; 
 	
+	/*
+		'high' for Calculate out of 32bit area. using HighAdressArea 
+	*/
+	
 	for(int i=0; i<PAGE_MAX_ENTRY_COUNT * 64; i++)
 	{
 		DWORD high = (i * (PAGE_FLAG_DEFAULT >> 20) ) >> 12;

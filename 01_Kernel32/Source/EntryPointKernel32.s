@@ -59,7 +59,7 @@ A20GATEENABLESUCCESS:
 	mov eax, 0x4000003B
 	mov cr0, eax
 
-	jmp dword 0x08 : (PROTECTEDMODE - $$ + 0x10000)
+	jmp dword 0x18 : (PROTECTEDMODE - $$ + 0x10000)
 
 
 	; Following Code Now Prtoected Mode
@@ -67,7 +67,7 @@ A20GATEENABLESUCCESS:
 [BITS 32]
 
 PROTECTEDMODE:
-	mov ax, 0x10
+	mov ax, 0x20
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
@@ -94,7 +94,7 @@ PROTECTEDMODE:
 	add  esp, 16
 
 
-	jmp dword 0x08:0x10200		;Let's Jump To C
+	jmp dword 0x18:0x10200		;Let's Jump To C
 
 PRINT:
 	push ebp
@@ -160,7 +160,22 @@ GDT:
 	db 0x00
 	db 0x00
 
-
+	IA_32eCodeDescriptor:
+	dw 0xFFFF	; Limit[15:0]
+	dw 0x0000	; Base[15:0]
+	db 0x00		; Base[23:16] 
+	db 0x9A		; P = 1, DPL = 0, Code Segment, Execute/Read
+	db 0xAF		; G = 1, D = 0, L = 1, Limit [19:16]
+	db 0x00		; Base[31:24]
+	
+	IA_32eDataDescriptor:
+	dw 0xFFFF	; Limit[15:0]
+	dw 0x0000	; Base[15:0]
+	db 0x00		; Base[23:16] 
+	db 0x92		; P = 1, DPL = 0, Code Segment, Execute/Read
+	db 0xAF		; G = 1, D = 0, L = 1, Limit [19:16]
+	db 0x00		; Base[31:24]
+	
 	CODEDescriptor:
 	dw 0xFFFF	; Limit[15:0]
 	dw 0x0000	; Base[15:0]
