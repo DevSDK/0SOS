@@ -1,5 +1,5 @@
 NASM32 = nasm
-GCC32 = gcc -C -m32 -ffreestanding
+GCC32 = gcc -std=c99 -C -m32 -ffreestanding
 LD32 = ld -elf_i386 -nostdlib -T ../../LinkerScript.x
 OBJCOPY32 = objcopy -j .text -j .data -j .rodata -j bss -S -O binary 
 

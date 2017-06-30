@@ -30,17 +30,20 @@ START:
 
 
 	;;;;;;;;;; PRINT HELLO ;;;;;;;
-	push HELLO
-	push 0
-	push 0
-	call PRINT
-	add sp, 6
-	;;;;;;;;;; PRINT LOAD INFO ;;;;;;
-	push LOADINFO
-	push 0
+
+	push HELLO	
+	push 0x0B
+	push 30
 	push 1
 	call PRINT
-	add sp, 6
+	add sp, 8
+	;;;;;;;;;; PRINT LOAD INFO ;;;;;;
+	push LOADINFO
+	push 0x0F
+	push 5
+	push 3
+	call PRINT
+	add sp, 8
 
 
 	
@@ -91,18 +94,21 @@ DISKRESET:
 	jmp .READ
 BREAKREAD:
 	push LOADSUCCESS
-	push 24
-	push 1
+	push 0xA
+	push 60
+	push 3
 	call PRINT
-	add sp,6
+	add sp,8
 
 	jmp 0x1000:0x0000
 
 ERRORHANDLER:
 	push DISKERROR
-	push 24
-	push 12
+	push 0x0C
+	push 60
+	push 3
 	call PRINT
+	add sp, 8
 	jmp $
 
 PRINT:
@@ -126,19 +132,22 @@ PRINT:
 	mov di, ax
 
 	mov ax, word[bp + 6]
+	
 	mov si, 2
 	mul si
 	add di, ax
 
-	mov si, word[bp+8]
+	mov si, word[bp+10]
+	mov bl, byte[bp+8]
+	
 .PRINTLOOP
 	mov cl, byte[si]
-
+		
 	cmp cl,0
 	je .ENDPRINTLOOP
 
 	mov byte[es:di], cl
-
+	mov byte[es:di+1], bl
 	add si, 1
 	add di, 2
 	jmp .PRINTLOOP
@@ -170,7 +179,7 @@ CLEAR:
 	
 .CLEARLOOP:
 	mov byte[es:si],0
-	mov byte[es:si+1], 0x0B
+	mov byte[es:si+1], 0x0F
 	add si,2
 	
 	cmp si,80*25*2
@@ -187,10 +196,10 @@ CLEAR:
 
 
 
-HELLO: db 'Welcome To 0SOS.',0
-DISKERROR: db 'ERROR', 0
-LOADSUCCESS: db 'SUCCESS',0
-LOADINFO: db 'Now Loading From DISK...', 0
+HELLO: db 'Welcome 0SOS',0
+DISKERROR: db '[ERROR]', 0
+LOADSUCCESS: db '[SUCCESS]',0
+LOADINFO: db 'Now Loading From DISK ................................', 0
 
 SECTOR:	db 0x02
 HEADER:	db 0x00

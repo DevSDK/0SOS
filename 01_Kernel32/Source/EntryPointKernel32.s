@@ -9,6 +9,28 @@ START:
 
 	mov ds, ax
 	mov es, ax
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	; Enable A20 Gate
+
+	mov ax, 0x2401
+	int 0x15
+	jc A20GATEENABLEERROR
+
+	jmp A20GATEENABLESUCCESS
+
+
+
+
+A20GATEENABLEERROR:
+	in al, 0x92
+	or al, 0x02
+	and al, 0xFE
+	out 0x92, al
+
+A20GATEENABLESUCCESS:
+
+
+	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
 	cli		;Ignore Interrupt
 
@@ -57,10 +79,20 @@ PROTECTEDMODE:
 	mov ebp, 0XFFFE
 		
 	push (SWITCHMESSAGE - $$ + 0x10000)
-	push 2
-	push 0
+	push 0x0F
+	push 4
+	push 5
 	call PRINT
-	add  esp, 12
+	add  esp, 16
+
+
+	push (SUCCESS - $$ + 0x10000)
+	push 0x0A
+	push 4
+	push 60
+	call PRINT
+	add  esp, 16
+
 
 	jmp dword 0x08:0x10200		;Let's Jump To C
 
@@ -82,9 +114,8 @@ PRINT:
 	mov esi, 2
 	mul esi
 	add edi, eax
-		
-	mov esi, dword[ebp + 16]
-	
+	mov bl, byte[ebp + 16]
+	mov esi, dword[ebp + 20]	
 .PRINTLOOP:
 	mov cl, byte[esi]
 	
@@ -92,7 +123,7 @@ PRINT:
 	je PRINTEND
 	
 	mov byte[edi + 0xB8000], cl
-	
+	mov byte[edi + 0xB8000+1], bl	
 	add esi,1
 	add edi,2	
 	jmp .PRINTLOOP
@@ -148,6 +179,8 @@ GDT:
 GDTREND:
 
 
-SWITCHMESSAGE: db 'Switch Success. Now Running 32bit Protected Mode.',0
+SWITCHMESSAGE: db 'Switch to 32bit protected mode ....................... ',0
+SUCCESS: db '[SUCCESS]',0
+
 
 times 512 - ( $ - $$) db 0x00

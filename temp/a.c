@@ -1,12 +1,14 @@
 
 
-int Add(int a, int b, int c)
+int Add(char* tmp,int b, int c)
 {
-	return a+b+c;
+	int i =0;
+	for( i = 0; i<sizeof(tmp); i++);
+	return i+b+c;
 }
 
 int main()
 {
-	Add(0,1,2);
+	Add(0,1,0);
 	return 0;
 }
