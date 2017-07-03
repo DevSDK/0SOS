@@ -18,7 +18,7 @@ void GetCPUID(DWORD in_eax, DWORD* out_eax,DWORD* out_ebx ,DWORD* out_ecx, DWORD
 	Switch 64Bit Kernel Mode 
 	
 	Set CR4 Register PAE = 1
-	Set CR3 Register PML4 Table Adress 0x100000
+	Set CR3 Register PML4 Table  0x100000
 	Set IA32_EFER.LME = 1 to Enable IA-32e
 	Set CR0 Register NW = 0 CD = 0 PG 1
 	 

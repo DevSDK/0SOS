@@ -2,6 +2,7 @@
 
 int Add(char* tmp,int b, int c)
 {
+	long t = b;
 	int i =0;
 	for( i = 0; i<sizeof(tmp); i++);
 	return i+b+c;

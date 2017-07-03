@@ -10,15 +10,15 @@
 
 
 int AdjustmentInSectorSize(int Fd, int SourceSize);
-void WriteKernelInfo(int Target, int KernelSelectorCount);
+void WriteKernelInfo(int Target, int TotalSelectorCount, int Kernel32SectorCount);
 int CopyFile(int Source, int Target);
 	
 
 int main(int argc, char** argv)
 {
-	if(argc < 3)
+	if(argc < 4)
 	{
-		fprintf(stderr, "[ERROR] ImageMake BootLoader.bin Kernel32.bin\n");
+		fprintf(stderr, "[ERROR] ImageMake BootLoader.bin Kernel32.bin Kernel64.bin\n");
 		exit(-1);
 	}
 	
@@ -64,12 +64,32 @@ int main(int argc, char** argv)
 	SourceSize = CopyFile(SourceFd, TargetFd);
 	close(SourceFd);
 	
-	//Left Memory Fill 0x00. For align 512 Byte
-	int KernelSelectorCount = AdjustmentInSectorSize(TargetFd, SourceSize);
-	printf("[INFO] %s Size = [%d] and Sector Count = [%d]\n", argv[2], SourceSize, KernelSelectorCount);
+	int Kernel32SectorCount = AdjustmentInSectorSize(TargetFd, SourceSize);
+	printf("[INFO] %s Size = [%d] and Sector Count = [%d]\n", argv[2], SourceSize, Kernel32SectorCount);
 	
+	//
+	// Copy IA-32e Kernel
+	//	
+	printf("[INFO] Copy IA-32e mode kernel to image file\n");
+	SourceFd = open( argv[3], O_RDONLY );
+
+	if(SourceFd == -1)
+	{
+		fprintf(stderr, "[ERROR] %s Open Fail.\n", argv[3]);
+		exit(-1);
+	}
+
+	SourceSize = CopyFile(SourceFd, TargetFd);
+	close(SourceFd);	
+	
+	//Memory Fill 0x00. For align 512 Byte
+	int Kernel64SectorCount = AdjustmentInSectorSize(TargetFd, SourceSize);
+	printf("[INFO] %s Size = [%d] and Sector Count = [%d]\n", argv[3], SourceSize, Kernel64SectorCount);
+	
+
+
 	printf("[INFO] Start to Write Kernel Information\n" );
-	WriteKernelInfo(TargetFd, KernelSelectorCount);
+	WriteKernelInfo(TargetFd, Kernel32SectorCount + Kernel64SectorCount, Kernel32SectorCount);
 
 	printf("[INFO] Image File Generation Complate\n");
 
@@ -83,17 +103,17 @@ int main(int argc, char** argv)
 
 int AdjustmentInSectorSize(int Fd, int Size)
 {
-	int AdjustSelector = Size % SECTORSIZE;
+	int AdjustSector = Size % SECTORSIZE;
 	char ch = 0x00;
 	
-	if( AdjustSelector != 0)
+	if( AdjustSector != 0)
 	{
-		AdjustSelector = 512 - AdjustSelector;
-		printf("[INFO] File Size [%lu] and fill [%u] byte\n",Size, AdjustSelector);
+		AdjustSector = 512 - AdjustSector;
+		printf("[INFO] File Size [%lu] and fill [%u] byte\n",Size, AdjustSector);
 		
-		for(int i =0; i < AdjustSelector; i++)
+		for(int i =0; i < AdjustSector; i++)
 		{
-			write(Fd, ch, 1);	
+			write(Fd, &ch, 1);	
 		}
 		
 	}
@@ -102,13 +122,13 @@ int AdjustmentInSectorSize(int Fd, int Size)
 		printf("[INFO] File Size is Aligned 512 Byte\n");
 	}
 	
-	return (Size + AdjustSelector)/ SECTORSIZE;
+	return (Size + AdjustSector)/ SECTORSIZE;
 
 
 
 }
 
-void WriteKernelInfo(int Fd, int Count)
+void WriteKernelInfo(int Fd, int TotalSectorCount, int Kernel32SectorCount)
 {
 
 	int position = lseek(Fd, 5, SEEK_SET);
@@ -117,10 +137,15 @@ void WriteKernelInfo(int Fd, int Count)
 		fprintf(stderr, "[ERROR] lseek fail. return value = %d, errno = %d, %d \n", position, errno, SEEK_SET);
 		exit(-1);
 	}
-	int data = (unsigned short ) Count;
+	unsigned short data = (unsigned short ) TotalSectorCount;
 	write(Fd, &data, 2);
-	printf("[INFO] Total Sector Count = %d - except boot loader.\n", Count);
+	printf("[INFO] Total Sector Count = %d - except boot loader.\n", TotalSectorCount);
+    data = (unsigned short ) Kernel32SectorCount;
+	write(Fd, &data, 2);
+	printf("[INFO] Kernel32 Sector Count=%d\n", Kernel32SectorCount);
 
+
+	
 
 }
 

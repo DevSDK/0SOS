@@ -4,13 +4,25 @@
 void PrintVideoMemory(int x, int y,BYTE Attribute, const char* _str);
 BOOL CheckMemorySize();
 BOOL Initalization64KernelMemoryArea();
+void LoadKernel64ImageToMemory(DWORD _address);
 
-void __Kernel__Entry()
+void __KERNEL_ENTRY()
 {
 		
 	PrintVideoMemory(5,5,0x0F,"Initalization IA-32e Memory Area......................");
-	PrintVideoMemory(5,6,0x0F,"Check Memory Size > 64MB .............................");
 	
+	if(Initalization64KernelMemoryArea())
+	{
+		PrintVideoMemory(60,5,0x0A,"[SUCCESS]");
+	}
+	else
+	{
+		PrintVideoMemory(60,5,0x0C,"[ERROR]");
+		while(1);
+	}
+
+	
+	PrintVideoMemory(5,6,0x0F,"Check Memory Size > 64MB .............................");
 	if(CheckMemorySize())
 	{
 		PrintVideoMemory(60,6,0x0A,"[SUCCESS]");
@@ -21,15 +33,10 @@ void __Kernel__Entry()
 		while(1); //Maybe need Error Handler Function 
 	}
 
-	if(Initalization64KernelMemoryArea())
-	{
-		PrintVideoMemory(60,5,0x0A,"[SUCCESS]");
-	}
-	else
-	{
-		PrintVideoMemory(60,5,0x0C,"[ERROR]");
-		while(1);
-	}
+
+
+	
+	
 
 	PrintVideoMemory(5,7, 0x0F,"Initalization PML4, PDPT, PD .........................");
 	InitializePageTable();
@@ -59,40 +66,43 @@ void __Kernel__Entry()
 		PrintVideoMemory(60,9,0x0C,"[ERROR]");
 		while(1);
 	}
+
+
+	LoadKernel64ImageToMemory(0x200000);	
 	
-	PrintVideoMemory(5,10, 0x0F,"Now 64 Bit Mode.");
 	ModeSwitchAndJumpKernel64();
+
 		
 	while(1);
 }
 
 void PrintVideoMemory(int _x, int _y, BYTE _Attribute ,const char* _str)
 {
-	CHARACTER_MEMORY* Adress = ( CHARACTER_MEMORY* ) 0xB8000;
+	CHARACTER_MEMORY* Address = ( CHARACTER_MEMORY* ) 0xB8000;
 	
 	int i = 0;
 	
-	Adress+= ( _y * 80 ) + _x;
+	Address+= ( _y * 80 ) + _x;
 
 	for ( i = 0; _str[i] != 0; i++)
 	{
-		Adress[i].bCharactor = _str[i];
-		Adress[i].bAttribute = _Attribute;
+		Address[i].bCharactor = _str[i];
+		Address[i].bAttribute = _Attribute;
 	
 	}
 }
 
 BOOL Initalization64KernelMemoryArea()
 {
-	DWORD* Adress = (DWORD*) 0x100000;
+	DWORD* Address = (DWORD*) 0x100000;
 	
-	while((DWORD) Adress < 0x600000)
+	while((DWORD) Address < 0x600000)
 	{
-		*Adress = 0x00;
+		*Address = 0x00;
 
-		if( *Adress != 0 )
+		if( *Address != 0 )
 			return FALSE;
-		Adress++;
+		Address++;
 	}
 	
 		
@@ -102,18 +112,35 @@ BOOL Initalization64KernelMemoryArea()
 
 BOOL CheckMemorySize()
 {
-	DWORD* Adress = (DWORD*) 0x100000;
+	DWORD* Address = (DWORD*) 0x100000;
 	
-	while( (DWORD) Adress< 0x4000000 )
+	while( (DWORD) Address< 0x4000000 )
 	{
-		*Adress = 0x12345678;
+		*Address = 0x12345678;
 
-		if( *Adress != 0x12345678)
+		if( *Address != 0x12345678)
 			return FALSE;
 
-		Adress += (0x100000 / 4);
+		Address += (0x100000 / 4);
 	}
 	return TRUE;
 	
 }
 
+void LoadKernel64ImageToMemory(DWORD _address)
+{
+	WORD TotalKernelSector 	= *( (WORD*) 0x7C05);
+	WORD Kernel32Sector 	= *( (WORD*) 0x7C07);
+	
+	DWORD* SourceAddress = ((DWORD*) (0x10000 + Kernel32Sector * 512));
+	DWORD* DestAddress	= (DWORD*) 0x200000; 
+	
+	for(int i=0; i< 512 * (TotalKernelSector -Kernel32Sector) / 4; i++)
+	{
+		*DestAddress = *SourceAddress;
+		DestAddress++;
+		SourceAddress++;
+	}
+
+	
+}

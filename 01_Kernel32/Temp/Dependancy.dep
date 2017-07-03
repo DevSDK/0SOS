@@ -1,3 +1,0 @@
-Main.o: ../Source/Main.c ../Source/Types.h ../Source/Page.h \
- ../Source/SwitchMode.h
-Page.o: ../Source/Page.c ../Source/Page.h ../Source/Types.h

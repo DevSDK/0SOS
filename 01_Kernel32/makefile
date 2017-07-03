@@ -1,10 +1,10 @@
 NASM32 = nasm
-GCC32 = gcc -std=c99 -C -m32 -ffreestanding
-LD32 = ld -elf_i386 -nostdlib -T ../../LinkerScript.x
+GCC32 = gcc -g -std=c99 -C -m32 -ffreestanding
+LD32 = ld -elf_i386 -nostdlib -T ../LinkerScript32.x
 OBJCOPY32 = objcopy -j .text -j .data -j .rodata -j bss -S -O binary 
 
 
-OBJECTCOPYDIR = Temp
+OBJECTCOPYDIR = Obj
 SOURCECOPYDIR = Source
 
 
@@ -31,11 +31,11 @@ Kernel32.bin: $(OBJECTCOPYDIR)/EntryPoint.bin $(OBJECTCOPYDIR)/Kernel32.elf.bin
 	cat $^ > $@
 
 clean:
-	rm -rf *.bin
-	rm -rf $(OBJECTCOPYDIR)/*.*
+	rm -f *.bin
+	rm -f $(OBJECTCOPYDIR)/*.*
 
 
-CENTRYPOINTOBJECTFILE = Main.o
+CENTRYPOINTOBJECTFILE = __Kernel_Entry.o
 CSOURCEFILES = $(wildcard ../$(SOURCECOPYDIR)/*.c)
 ASSEMBLYSOURCEFILES = $(wildcard ../$(SOURCECOPYDIR)/*.asm)
 COBJECTFILES = $(subst Main.o, , $(notdir $(patsubst %.c,%.o,$(CSOURCEFILES))))

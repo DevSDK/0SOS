@@ -9,8 +9,8 @@ jmp 0x07C0:START
 ;;;; CONFIG ;;;;;
 ;;;;;;;;;;;;;;;;;
 
-TOTALSECTOR: dw 2
-
+TOTALSECTOR: dw	0x02 
+KERNEL32SECTOR: dw 0x02
 
 
 START:
@@ -74,7 +74,7 @@ DISKRESET:
 	int 0x13
 	jc ERRORHANDLER
 
-	;;;;;;;;;; calculate adress
+	;;;;;;;;;; calculate Address
 	add si, 0x0020
 
 	mov es, si

@@ -18,7 +18,7 @@ void InitializePageTable()
 
 	for(int i = 0; i < 64; i++)
 	{
-		SetPageEntryData(&pdptentry[i], 0, 0x10200 + i * PAGE_TABLE_SIZE,
+		SetPageEntryData(&pdptentry[i], 0, 0x102000 + i * PAGE_TABLE_SIZE,
 						 PAGE_FLAG_DEFAULT, 0);
 	}
 
@@ -30,12 +30,12 @@ void InitializePageTable()
 	DWORD LowMapping = 0; 
 	
 	/*
-		'high' for Calculate out of 32bit area. using HighAdressArea 
+		'high' for Calculate out of 32bit area. using HighAddressArea 
 	*/
 	
 	for(int i=0; i<PAGE_MAX_ENTRY_COUNT * 64; i++)
 	{
-		DWORD high = (i * (PAGE_FLAG_DEFAULT >> 20) ) >> 12;
+		DWORD high = (i * (PAGE_DEFAULT_SIZE >> 20) ) >> 12;
 		SetPageEntryData(&pdentry[i], high, LowMapping, 
 						PAGE_FLAG_DEFAULT | PAGE_FLAG_PS, 0);				
 
@@ -46,9 +46,9 @@ void InitializePageTable()
 }
 
 
-void SetPageEntryData(PTENTRY* pEntry, DWORD dwHighBaseAdress, DWORD dwLowBaseAdress,
+void SetPageEntryData(PTENTRY* pEntry, DWORD dwHighBaseAddress, DWORD dwLowBaseAddress,
 					  DWORD dwLowFlag, DWORD dwHighFlag)
 {
-	pEntry->dwLowAdress  = dwLowBaseAdress  | dwLowFlag;
-	pEntry->dwHighAdress = (dwHighBaseAdress & 0xFF )| dwHighFlag;
+	pEntry->dwLowAddress  = dwLowBaseAddress  | dwLowFlag;
+	pEntry->dwHighAddress = (dwHighBaseAddress & 0xFF )| dwHighFlag;
 }

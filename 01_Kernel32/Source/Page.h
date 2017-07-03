@@ -28,14 +28,14 @@
 /*
 
 	For IA-32e Paging
-	IA-32e Adress Structure
+	IA-32e Address Structure
 	63			48 47	39 38			   30 29	   21 20			0
 	|SIGNEXTENSION| PML4 | DIRECTORY POINTER | DIRCTORY  |    OFFSET     |
 
 	PML4 Refernce PML4 ENTRY
 	and, that Refernce DIRECTORY POINTER ENTRY using DIRECTORY POINTER
 	and, that Refernce DIRCTORY ENTRY using DIRECTORY 
-	and, DIRECTORY + OFFSET is Memory Adress. 
+	and, DIRECTORY + OFFSET is Memory Address. 
 	
 	so, We Need Space for this Structure
 	
@@ -54,17 +54,17 @@ typedef struct __Struct_PageEntry
 {	
 	
 	/*0----------------31 bit */
-	DWORD dwLowAdress;
+	DWORD dwLowAddress;
 	/*32---------------64 bit */
-	DWORD dwHighAdress;
+	DWORD dwHighAddress;
 
 } PML4ENTRY, PDPTENTRY, PDENTRY, PTENTRY;	
 
 #pragma(pop)
 
 void InitializePageTable();
-void SetPageEntryData(PTENTRY* pEntry, DWORD dwHighBaseAdress, 
-					  DWORD dwLowBaseAdress, DWORD dwLowFlag, DWORD dwHighFlag);
+void SetPageEntryData(PTENTRY* pEntry, DWORD dwHighBaseAddress, 
+					  DWORD dwLowBaseAddress, DWORD dwLowFlag, DWORD dwHighFlag);
 
 
 	
