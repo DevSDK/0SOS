@@ -1,5 +1,5 @@
-GCC64 = gcc -g -std=c99 -C -m64 -ffreestanding
-LD64 = ld -elf_x86-64  -nostdlib -T ../LinkerScript64.x
+GCC64 = gcc -g -std=c99 -C -m64 -ffreestanding 
+LD64 = ld -elf_x86-64  -nostdlib -T ../LinkerScript64.x 
 OBJCOPY64 = objcopy -j .text -j .data -j .rodata -j bss -S -O binary 
 NASM64 = nasm -f elf64
 
@@ -26,24 +26,25 @@ Kernel64.bin: ExecuteInternalBuild
 clean:
 	rm -rf *.bin
 	rm -rf $(OBJECTCOPYDIR)/*.*
-
+	rm -rf $(SOURCEDIR)/*.h.gch
 ENTRYPOINTFILE	= ../$(SOURCEDIR)/EntryPoint.s
 ENTRYPOINTOBJ	=  EntryPoint.o
-CSOURCEFILES = $(wildcard ../$(SOURCEDIR)/*.c)
-ASSEMBLYSOURCEFILES = $(wildcard ../$(SOURCEDIR)/*.asm)
-COBJECTFILES =  $(notdir $(patsubst %.c,%.o,$(CSOURCEFILES)))
-ASSEMBLYOBJECTFILES =  $(notdir $(patsubst %.asm, %.o, $(ASSEMBLYSOURCEFILES)))
+CSOURCEFILES = $(shell find ../$(SOURCEDIR)/ -name *.c)
+ASSEMBLYSOURCEFILES = $(shell find ../$(SOURCEDIR)/ -name *.asm)
+COBJECTFILES	    =  $(notdir $(patsubst %.c,   %.o,  $(CSOURCEFILES)))
+ASSEMBLYOBJECTFILES =  $(notdir $(patsubst %.asm, %.o,  $(ASSEMBLYSOURCEFILES)))
 
 $(ENTRYPOINTOBJ): $(ENTRYPOINTFILE)
 		$(NASM64) -o $@ $<
 
-%.o: ../$(SOURCEDIR)/%.c
-		$(GCC64) -c $<
-%.o: ../$(SOURCEDIR)%.asm
-		$(NASM64) -c $@ $<
+$(COBJECTFILES): $(CSOURCEFILES)
+	$(GCC64) -c $^
+$(ASSEMBLYOBJECTFILES): $(ASSEMBLYSOURCEFILES)
+	$(NASM64) -o $@ $<
 
 InternalDependency:
 	$(GCC64) -MM $(CSOURCEFILES) > Dependancy.dep
+	
 Kernel64.elf: $(ENTRYPOINTOBJ) $(COBJECTFILES) $(ASSEMBLYOBJECTFILES)
 	$(LD64) -o $@ $^ 
 
