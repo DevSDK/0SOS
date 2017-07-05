@@ -1,7 +1,7 @@
 #ifndef __PORT_IO_H_
 #define __PORT_IO_H_
 
-#include "../../Types.h"
+#include <Types.h>
 
 /*
 	Execute From Asam Code.

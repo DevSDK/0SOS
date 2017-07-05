@@ -1,6 +1,6 @@
 #ifndef __KEYBOARD_H_
 #define __KEYBOARD_H_
-#include "../../Types.h"
+#include <Types.h>
 #include "PS2Keyboard.h"
 #define KEY_SKIPCOUNT_PAUSE	2
 
@@ -122,7 +122,7 @@ static KeyMapEntry 		g_KeyMapScanTable[KEYMAP_TABLE_SIZE] = {
 	{ 'l'					,		'L'				}, //    38
 	{ ';'					,		':'				}, //    39
 	{ '\''					,		'"'				}, //    40
-	{ '`'					,		'~'				}, //    41	
+	{ '`'					,		'~'				}, //    41
 	{ KEY_LSHIFT			,		KEY_LSHIFT		}, //    42
 	{ '\\'					,		'|'				}, //    43
 	{ 'z'					,		'Z'				}, //    44
@@ -149,11 +149,11 @@ static KeyMapEntry 		g_KeyMapScanTable[KEYMAP_TABLE_SIZE] = {
 	{ KEY_F7				,		KEY_F7			}, //    65
 	{ KEY_F8				,		KEY_F8 			}, //    66
 	{ KEY_F9				,		KEY_F9			}, //    67
-	{ KEY_F10				,		KEY_F10			}, //    68	
-	{ KEY_NUMLOCK			,		KEY_NUMLOCK		}, //    69	
+	{ KEY_F10				,		KEY_F10			}, //    68
+	{ KEY_NUMLOCK			,		KEY_NUMLOCK		}, //    69
 	{ KEY_SCROLLLOCK		,		KEY_SCROLLLOCK	}, //    70
 	{ KEY_HOME				,		'7'				}, //    71
-	{ KEY_ARROW_UP			,		'8'				}, //    72	
+	{ KEY_ARROW_UP			,		'8'				}, //    72
 	{ KEY_PAGE_UP			,		'9'				}, //    73
 	{ '-'					,		'-'				}, //    74
 	{ KEY_ARROW_LEFT		,		'4'				}, //    75
@@ -189,5 +189,3 @@ BOOL ConvertScancodeToASCII( BYTE _ScanCode, BYTE* _ASCIICode, BOOL* _flags);
 
 
 #endif /* __KEY_MAP_H_ */
-
-

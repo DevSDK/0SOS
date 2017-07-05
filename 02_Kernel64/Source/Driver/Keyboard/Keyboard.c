@@ -1,5 +1,5 @@
 #include "Keyboard.h"
-#include "../../Types.h"
+#include <Types.h>
 
 BOOL IsAlphabetScanCode(BYTE _ScanCode)
 {
@@ -28,6 +28,7 @@ BOOL IsNumberPadScanCode(BYTE _ScanCode)
 	return FALSE;
 }
 
+//For Shift, Caps Lock , ETC Combined Code
 BOOL IsUseCombinedCode(BOOL _ScanCode)
 {
 	BYTE DownScanCode = _ScanCode & 0x7F;
@@ -59,7 +60,7 @@ BOOL IsUseCombinedCode(BOOL _ScanCode)
 	return IsCombinedKey;
 }
 
-
+//Sync Status , Keyboard LED 
 void SyncKeyStatusAndLED(BYTE _ScanCode)
 {
 	BOOL IsDown = FALSE;
@@ -103,6 +104,8 @@ void SyncKeyStatusAndLED(BYTE _ScanCode)
 	}
 }
 
+
+//Convert Scan Code To ASCII
 BOOL ConvertScancodeToASCII(BYTE _ScanCode, BYTE* _ASCIICode, BOOL* _flags)
 {
 	

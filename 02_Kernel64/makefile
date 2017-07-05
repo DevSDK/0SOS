@@ -1,4 +1,4 @@
-GCC64 = gcc -g -std=c99 -C -m64 -ffreestanding 
+GCC64 = gcc -g -std=c99 -C -m64 -ffreestanding -I ../Source/
 LD64 = ld -elf_x86-64  -nostdlib -T ../LinkerScript64.x 
 OBJCOPY64 = objcopy -j .text -j .data -j .rodata -j bss -S -O binary 
 NASM64 = nasm -f elf64
