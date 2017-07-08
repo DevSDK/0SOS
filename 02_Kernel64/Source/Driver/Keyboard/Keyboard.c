@@ -151,3 +151,4 @@ BOOL ConvertScancodeToASCII(BYTE _ScanCode, BYTE* _ASCIICode, BOOL* _flags)
 	return TRUE;
 
 }
+	

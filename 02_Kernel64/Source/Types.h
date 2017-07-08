@@ -23,7 +23,7 @@ typedef struct _Charactor_Struct
 } CHARACTER_MEMORY;
 
 
-#pragma( pop )
+#pragma pack( pop )
 #endif /* __TYPES_H__ */
 
 

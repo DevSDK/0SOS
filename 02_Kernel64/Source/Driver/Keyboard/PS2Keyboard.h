@@ -1,7 +1,6 @@
 #ifndef __PA2KEYBOARD_H_
 #define __PA2KEYBOARD_H_
 #include <Types.h>
-#include <Driver/IO/PortIO.h>
 
 /*
 	This file implementation Keyboard Port Driver
