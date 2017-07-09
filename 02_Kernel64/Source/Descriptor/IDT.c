@@ -3,7 +3,7 @@
 void InitializeIDTTables()
 {
     IDTR* idtr = (IDTR*) IDTR_POINTER;
-    IDT_ENTRY* entry =  (IDT_ENTRY*)IDTR_POINTER + sizeof(IDTR);
+    IDT_ENTRY* entry =  (IDT_ENTRY*)(IDTR_POINTER + sizeof(IDTR));
     
     idtr->BaseAddress   = (QWORD)entry;
     idtr->Size          = IDT_TABLE_SIZE - 1;
@@ -17,9 +17,9 @@ void InitializeIDTTables()
 void SetIDTEntry(IDT_ENTRY* _entry, void* _handler, WORD _Selector, 
                     BYTE _IST, BYTE _Flags, BYTE _Type)
 {
-    _entry->Low_BaseAddress =  (QWORD) _handler;
+    _entry->Low_BaseAddress =  (QWORD) _handler & 0xFFFF;
     _entry->SegmentSelector = _Selector;
-    _entry->IST             = _IST;
+    _entry->IST             = _IST & 0x3;
     _entry->FlagsAndType   = _Flags | _Type;
     _entry->Mid_BaseAddress = ((QWORD)_handler >> 16) & 0xFFFF;
     _entry->High_BaseAddres = ((QWORD)_handler >> 32);
@@ -43,12 +43,16 @@ void Pt(int _x, int _y, BYTE _Attribute ,const char* _str)
 }
 void DummyHandler()
 {
-    Pt(0,0,0x0C ,"===============================");
-    Pt(0,1,0x0C ,"===============================");
-    Pt(0,2,0x0C ,"===    Test Interrupt Hander===");
-    Pt(0,3,0x0C ,"===============================");
-    Pt(0,4,0x0C ,"===============================");
+    Pt(0,0,0x0F ,"===============================");
+    Pt(0,1,0x0F ,"===============================");
+    Pt(0,2,0x0F ,"===    Test Interrupt Hander===");
+    Pt(0,3,0x0F ,"===============================");
+    Pt(0,4,0x0F ,"===============================");
+    
+    while(1)
+    {
 
-    while(1);
+        
+    }
 
 }

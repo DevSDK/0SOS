@@ -18,7 +18,7 @@ void InitializeGDTWithTSS()
     SetGDT_Entry16(((GDT_ENTRY16*)(&_gdt_entry[3])), (QWORD)_tss_segment, sizeof(TSS_SEGMENT)-1, GDT_ENTRY_HIGH_TSS,
                     GDT_ENTRY_LOW_TSS, GDT_TYPE_TSS);
 
-
+    InitializeTSSSegment(_tss_segment);
     
 }
 void SetGDT_Entry8(GDT_ENTRY8* _entry, DWORD _BaseAddress,

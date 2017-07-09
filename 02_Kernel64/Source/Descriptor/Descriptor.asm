@@ -13,5 +13,5 @@ LoadTR:
     ret
 
 LoadIDTR:
-    lgdt[rdi]
+    lidt[rdi]
     ret

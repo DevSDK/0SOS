@@ -45,7 +45,10 @@ void __KERNEL_ENTRY()
 			BYTE temp = PS2GetKeyboardScanCode();
 			if(ConvertScancodeToASCII( temp, &temps[0], &flags) == TRUE)
 				if(flags & KEY_DOWN )
+				{
 					PrintVideoMemory(i++, 15, 0x0C, temps);
+					int b = 10 / 0;
+				}
 			
 		
 		}
