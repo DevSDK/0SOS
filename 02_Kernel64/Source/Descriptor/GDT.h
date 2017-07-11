@@ -47,7 +47,7 @@ Load GDTR on 0x142000
 #define GDT_KERNEL_DATA_SEGMENT 0x10
 #define GDT_TSS_SEGMENT         0x18
 
-#define GDTR_POINTER            0x142000    //1MB + 256KB
+#define GDTR_POINTER            0x142000    //1MB + 264KB
 
 #define GDT_MAX_ENTRY8_COUNT    3
 #define GDT_MAX_ENTRY16COUNT    1  

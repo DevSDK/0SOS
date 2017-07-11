@@ -60,6 +60,7 @@ ModeSwitchAndJumpKernel64:
 	mov eax, 0x100000
 	mov cr3, eax
 	
+	;EFFR Set	
 	mov ecx, 0xC0000080
 	rdmsr
 	or eax, 0x0100

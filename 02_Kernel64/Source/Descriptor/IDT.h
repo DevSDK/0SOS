@@ -19,7 +19,7 @@
 #define IDTR_POINTER            (sizeof(GDTR) + GDTR_POINTER \
                                 + GDT_TABLE_SIZE + TSS_SEGMENT_SIZE)
 #define IDT_POINTER            (sizeof(IDTR) + IDTR_POINTER)
-#define IDT_TABLE_SIZE          (IDT_MAX_ENTRY_COUNT + sizeof(IDT_ENTRY))
+#define IDT_TABLE_SIZE          (IDT_MAX_ENTRY_COUNT * sizeof(IDT_ENTRY))
 
 
 #define IST_POINTER         0x700000

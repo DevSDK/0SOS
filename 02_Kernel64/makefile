@@ -22,7 +22,8 @@ ExecuteInternalBuild: dep
 
 Kernel64.bin: ExecuteInternalBuild
 		$(OBJCOPY64) $(OBJECTCOPYDIR)/Kernel64.elf $@
-
+		rm -rf *.h.gch
+		rm -rf $(SOURCEDIR)/*/*.h.gch
 clean:
 	rm -rf *.bin
 	rm -rf $(OBJECTCOPYDIR)/*.*

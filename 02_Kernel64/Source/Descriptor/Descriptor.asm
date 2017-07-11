@@ -1,8 +1,7 @@
 [BITS 64]
                      
 global LoadGDTR, LoadTR, LoadIDTR
-
-                               
+                        
 SECTION .text
 
 LoadGDTR:
