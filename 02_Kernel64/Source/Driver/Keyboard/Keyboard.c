@@ -1,6 +1,11 @@
 #include "Keyboard.h"
 #include <Types.h>
 
+void InitalizeKeyboardBuffer()
+{
+	InitializeQueue(&g_KeyBufferQueue, g_KeyBufferMemory, KEY_BUFFER_SIZE, sizeof(KEYDATA));
+}
+
 BOOL IsAlphabetScanCode(BYTE _ScanCode)
 {
 	if( ('a' <= g_KeyMapScanTable[_ScanCode].NormalCode)&&
@@ -151,4 +156,32 @@ BOOL ConvertScancodeToASCII(BYTE _ScanCode, BYTE* _ASCIICode, BOOL* _flags)
 	return TRUE;
 
 }
-	
+
+
+BOOL ConvertScanCodeWithPushKeyQueue(BYTE _ScanCode)
+{
+	KEYDATA keydata;
+	keydata.ScanCode = _ScanCode;
+	BOOL result = FALSE;
+	if(ConvertScancodeToASCII(_ScanCode, &keydata.ASCIICode, &keydata.Flags) == TRUE)
+	{
+		BOOL interrupt_status = SetInterruptFlag(FALSE);
+		result = PushQueue(&g_KeyBufferQueue, &keydata);
+		SetInterruptFlag(interrupt_status);
+	}
+	return result;
+}
+
+
+
+BOOL GetKeyData(KEYDATA* _data)
+{
+	BOOL result = FALSE;
+	if(IsQueueEmpty(&g_KeyBufferQueue))
+		return FALSE;
+
+	BOOL interruptstatus = SetInterruptFlag(FALSE);
+	result = PopQueue(&g_KeyBufferQueue,_data);
+	SetInterruptFlag(interruptstatus);
+	return result;
+}

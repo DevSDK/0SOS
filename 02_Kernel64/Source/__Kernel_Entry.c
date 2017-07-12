@@ -30,7 +30,13 @@ void __KERNEL_ENTRY()
 	MaskPICInterrupt(0);
 	EnableInterrupt();
 	PrintVideoMemory(60,15,0x0A,"[SUCCESS]");
-	
+
+	PrintVideoMemory(5,16, 0x0F,"Keyboard Input Buffer Initialize.......................");
+	InitalizeKeyboardBuffer();
+
+	PrintVideoMemory(60,16,0x0A,"[SUCCESS]");
+
+
 	BYTE flags;
 	int i = 14;
 	char temps[2] = {0,};
@@ -42,19 +48,16 @@ void __KERNEL_ENTRY()
 	}
 	
 	
+	KEYDATA keydata;
 	while(1)
 	{
-		if(PS2CheckOutputBufferNotEmpty() == TRUE)
+		if(GetKeyData(&keydata) == TRUE)
 		{
-
-			BYTE temp = PS2GetKeyboardScanCode();
-			if(ConvertScancodeToASCII( temp, &temps[0], &flags) == TRUE)
-				if(flags & KEY_DOWN )
-				{
-					PrintVideoMemory(i++, 16, 0x0C, temps);
-				
-				}
-			
+			if(keydata.Flags & KEY_DOWN)
+			{
+				temps[0] = keydata.ASCIICode;
+				PrintVideoMemory(i++, 17, 0x0C, temps);
+			}
 		
 		}
 

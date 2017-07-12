@@ -5,4 +5,5 @@ void EnableInterrupt();
 void DisableInterrupt();
 QWORD ReadFlags();
 
+
 #endif /*__INTERRUPT_H__*/

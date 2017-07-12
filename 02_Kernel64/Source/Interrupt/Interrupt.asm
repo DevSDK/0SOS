@@ -4,7 +4,6 @@ SECTION .text
 
 global EnableInterrupt, DisableInterrupt, ReadFlags
 
-
 EnableInterrupt:
     sti
     ret

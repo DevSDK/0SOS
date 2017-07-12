@@ -2,6 +2,7 @@
 #define __KEYBOARD_H_
 #include <Types.h>
 #include "PS2Keyboard.h"
+#include <UDS/Queue.h>
 #define KEY_SKIPCOUNT_PAUSE	2
 
 #define KEY_UP		0x00
@@ -9,7 +10,7 @@
 #define KEY_EXTEND	0x02
 
 #define KEYMAP_TABLE_SIZE 89
-
+#define KEY_BUFFER_SIZE 100
 
 #define KEY_NONE		0x00
 #define KEY_ENTER		'\n'
@@ -61,7 +62,6 @@ typedef struct _StructKeyMapEntry
 
 } KeyMapEntry;
 
-#pragma pack(pop)
 
 typedef struct _KeyboardSataus
 {
@@ -75,9 +75,24 @@ typedef struct _KeyboardSataus
 
 } KeyboardStatus;
 
+typedef struct _KeyDataStruct
+{
+	BYTE ScanCode;
+	BYTE ASCIICode;
+	BYTE Flags;
+} KEYDATA;
+
+
+#pragma pack(pop)
+
 
 
 static KeyboardStatus	g_KeyboardStatus= { 0,};
+
+static QUEUE g_KeyBufferQueue;
+static KEYDATA g_KeyBufferMemory[KEY_BUFFER_SIZE];
+
+
 
 
 static KeyMapEntry 		g_KeyMapScanTable[KEYMAP_TABLE_SIZE] = {
@@ -173,17 +188,15 @@ static KeyMapEntry 		g_KeyMapScanTable[KEYMAP_TABLE_SIZE] = {
 
 };
 
-
+void InitalizeKeyboardBuffer();
 BOOL IsAlphabetScanCode( BYTE _ScanCcode );
 BOOL IsNumberOrSymbolScanCode( BYTE _ScanCode );
 BOOL IsNumberPadScanCode(BYTE _ScanCode);
 BOOL IsUseCombinedCode(BOOL _ScanCode);
 void SyncKeyStatusAndLED( BYTE _ScanCode);
 BOOL ConvertScancodeToASCII( BYTE _ScanCode, BYTE* _ASCIICode, BOOL* _flags);
-
-
-
-
+BOOL ConvertScanCodeWithPushKeyQueue(BYTE _ScanCode);
+BOOL GetKeyData(KEYDATA* _data);
 
 
 

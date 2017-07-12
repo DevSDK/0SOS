@@ -1,6 +1,5 @@
 #include <Driver/IO/PortIO.h>
 
-
 BOOL PS2CheckOutputBufferNotEmpty()
 {
 	
@@ -16,9 +15,40 @@ BOOL PS2CheckInputBufferNotEmpty()
 	return FALSE;
 }
 
+
+
+
+BOOL WaitACKWithScanCodePushQueue()
+{
+	BOOL result = FALSE;
+
+	for(int i = 0; i< 100; i++)
+	{
+		for(int j = 0 ; j < 0xFFFF; j++)
+		{
+			if(PS2CheckOutputBufferNotEmpty())
+				break;
+		}		
+		BYTE data = PortIO_InByte(0x60);
+		if(data == 0xFA)
+		{
+			result = TRUE;
+			break;
+		}
+		else
+		{
+			ConvertScanCodeWithPushKeyQueue(data);
+		}
+	}
+	return result; 	
+}
+
+
 BOOL PS2ActivationKeyboard()
 {
 
+
+	BOOL interrupt_status = SetInterruptFlag(FALSE);
 	PortIO_OutByte( 0x64, 0xAE );
 	
 	for(int i=0; i< 0xFFFF; i++)
@@ -31,22 +61,13 @@ BOOL PS2ActivationKeyboard()
 
 	PortIO_OutByte(0x60, 0xF4);
 
-	for(int i=0; i<123; i++)
-	{
-		for(int j = 0; j < 0xFFFF; j++)
-		{
-			if(PS2CheckOutputBufferNotEmpty() == TRUE)
-			{
-				break;
-		
-			}
-		}
+	BOOL result = WaitACKWithScanCodePushQueue();
 
-		if(PortIO_InByte(0x60) == 0xFA)
-			return TRUE;
-	}
 
-	return FALSE;
+
+	SetInterruptFlag(interrupt_status);
+
+	return result;
 
 }
 
@@ -81,6 +102,8 @@ void PS2EnableA20Gate()
 BOOL PS2SetKeyboardLED(BOOL _CapsLockOn, BOOL _NumLockOn, BOOL _ScrollLockOn)
 {
 
+	BOOL intrrupt_status = SetInterruptFlag(FALSE);
+	
 	//Busy Waiting 0xFFFF Iteration.
 	for(int i = 0; i< 0xFFFF; i++)
 	{
@@ -98,21 +121,9 @@ BOOL PS2SetKeyboardLED(BOOL _CapsLockOn, BOOL _NumLockOn, BOOL _ScrollLockOn)
 			break;
 	}
 	
-	int ic=0;	
-
-	for(ic = 0; ic< 125; ic++)
-	{
-		for(int j=0; j< 0xFFFF; j++)
-		{
-			if(PS2CheckOutputBufferNotEmpty()== TRUE)
-				break;
-		}
-		
-		if(PortIO_InByte(0x60) == 0xFA)
-			break;
-	}
+	BOOL result = WaitACKWithScanCodePushQueue();
 	
-	if(ic  >= 125)
+	if(result == FALSE)
 		return FALSE;
 
 		
@@ -124,20 +135,9 @@ BOOL PS2SetKeyboardLED(BOOL _CapsLockOn, BOOL _NumLockOn, BOOL _ScrollLockOn)
 			break;
 	}
 
-	for(ic = 0; ic < 125; ic++)
-	{
-		for(int j = 0; j < 0xFFFF; j++)
-		{
-			if(PS2CheckOutputBufferNotEmpty() == TRUE)
-				break;
-		}
+	result = WaitACKWithScanCodePushQueue();
 
-		if(PortIO_InByte(0x60) == 0xFA)
-			break;
-
-	}
-	
-	if(ic >= 125)
+	if(result == FALSE)
 		return FALSE;
 	
 	return TRUE;
@@ -160,6 +160,10 @@ void PS2Reboot()
 
 	}
 }
+
+
+
+
 
 BYTE PS2GetKeyboardScanCode()
 {

@@ -14,10 +14,10 @@ void PS2EnableA20Gate();
 
 BOOL PS2SetKeyboardLED(BOOL _CapsLockOn, BOOL _NumLockOn,  BOOL _ScrollLockOn);
 
-BOOL PS2CheckOutputBufferNotEmpty();
 BOOL PS2CheckInputBufferNotEmpty();
-
+BOOL WaitACKWithScanCodePushQueue();
 BYTE PS2GetKeyboardScanCode();
+BOOL PS2CheckOutputBufferNotEmpty();
 void PS2Reboot();
 
 
