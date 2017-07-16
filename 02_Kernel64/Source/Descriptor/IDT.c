@@ -68,29 +68,3 @@ void SetIDTEntry(IDT_ENTRY* _entry, void* _handler, WORD _Selector,
     _entry->High_BaseAddres = ((QWORD)_handler >> 32);
     _entry->Reserved        = 0;
 }
-
-void Pt(int _x, int _y, BYTE _Attribute ,const char* _str)
-{
-    CHARACTER_MEMORY* Address = ( CHARACTER_MEMORY* ) 0xB8000;
-	
-	int i = 0;
-	
-	Address+= ( _y * 80 ) + _x;
-	
-	for ( i = 0; _str[i] != 0; i++)
-	{
-		Address[i].bCharactor = _str[i];
-		Address[i].bAttribute = _Attribute;
-		
-	}
-}
-void DummyHandler()
-{
-    Pt(0,0,0x0F ,"===============================");
-    Pt(0,1,0x0F ,"===============================");
-    Pt(0,2,0x0F ,"===    Test Interrupt Hander===");
-    Pt(0,3,0x0F ,"===============================");
-    Pt(0,4,0x0F ,"===============================");
-    
-    while(1);   //복귀 코드 없음
-}

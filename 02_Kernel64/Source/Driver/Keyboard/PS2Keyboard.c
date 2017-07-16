@@ -21,7 +21,6 @@ BOOL PS2CheckInputBufferNotEmpty()
 BOOL WaitACKWithScanCodePushQueue()
 {
 	BOOL result = FALSE;
-
 	for(int i = 0; i< 100; i++)
 	{
 		for(int j = 0 ; j < 0xFFFF; j++)

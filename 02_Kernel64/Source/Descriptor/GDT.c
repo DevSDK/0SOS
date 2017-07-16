@@ -28,7 +28,7 @@ void SetGDT_Entry8(GDT_ENTRY8* _entry, DWORD _BaseAddress,
     _entry->Low_BaseAddress     = _BaseAddress & 0xFFFF;
     _entry->Low_BaseAddress1    = ( _BaseAddress >> 16 ) & 0xFF;
     _entry->Low_Flags           = _LowFlags | _Type;
-    _entry->High_FlagsAndSize   = ((_Size>>16) & 0xFF) | _HighFlags;
+    _entry->High_FlagsAndSize   = ((_Size>>16) & 0x0F) | _HighFlags;
     _entry->High_BaseAddress    = (_BaseAddress>>24) & 0xFF;
 }
 
@@ -39,7 +39,7 @@ void SetGDT_Entry16(GDT_ENTRY16* _entry, QWORD _BaseAddress,
     _entry->Low_BaseAddress     = _BaseAddress & 0xFFFF;
     _entry->Mid_BaseAddress     = (_BaseAddress >> 16 ) & 0xFF;
     _entry->Low_Flags           = _LowFlags | _Type;
-    _entry->High_FlagsAndSize   = ((_Size >> 16) & 0xFF) | _HighFlags;
+    _entry->High_FlagsAndSize   = ((_Size >> 16) & 0x0F) | _HighFlags;
     _entry->High_BaseAddress    = (_BaseAddress  >> 24) & 0xFF;
     _entry->High_BaseAddress2   = (_BaseAddress>>32);
     _entry->Reserved            = 0;

@@ -15,13 +15,6 @@
 #pragma pack(push, 1)
 
 
-typedef struct _Charactor_Struct
-{
-	BYTE bCharactor;
-	BYTE bAttribute;
-
-} CHARACTER_MEMORY;
-
 
 #pragma pack( pop )
 #endif /* __TYPES_H__ */

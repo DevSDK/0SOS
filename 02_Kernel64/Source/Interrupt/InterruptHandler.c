@@ -8,7 +8,7 @@ void __DebugIntOutput(int _Vector, int _Count)
     Buffer[6] = _Vector%10 + '0';
     Buffer[8] = _Count/10  + '0';
     Buffer[9] = _Count%10  + '0';  
-    PrintVideoMemory(69,0,0x0F,Buffer);
+    _PrintStringXY(69,0,0x0F,Buffer);
 }
 
 void DefaultExceptionHandler(int _Vector, QWORD _ErrorCode)
@@ -16,11 +16,11 @@ void DefaultExceptionHandler(int _Vector, QWORD _ErrorCode)
     char Buffer[3] = {0,};
     Buffer[0] = '0' + _Vector/10;
     Buffer[1] = '0' + _Vector%10;
-    PrintVideoMemory(0,0,0xF,"================================================================================");
-    PrintVideoMemory(0,1,0xF,"Exception:                                                                      ");
-    PrintVideoMemory(0,2,0xF,"                                                                                ");
-    PrintVideoMemory(0,3,0xF,"================================================================================");
-    PrintVideoMemory(11,1,0xF, Buffer);
+    _PrintStringXY(0,0,0xF,"================================================================================");
+    _PrintStringXY(0,1,0xF,"Exception:                                                                      ");
+    _PrintStringXY(0,2,0xF,"                                                                                ");
+    _PrintStringXY(0,3,0xF,"================================================================================");
+    _PrintStringXY(11,1,0xF, Buffer);
 
     while(1);
 }

@@ -17,5 +17,5 @@ START:
 	mov rbp, 0x6FFFF8
 
 	call __KERNEL_ENTRY
-
+	
 	jmp $

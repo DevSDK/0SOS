@@ -177,9 +177,10 @@ BOOL ConvertScanCodeWithPushKeyQueue(BYTE _ScanCode)
 BOOL GetKeyData(KEYDATA* _data)
 {
 	BOOL result = FALSE;
+
 	if(IsQueueEmpty(&g_KeyBufferQueue))
 		return FALSE;
-
+	
 	BOOL interruptstatus = SetInterruptFlag(FALSE);
 	result = PopQueue(&g_KeyBufferQueue,_data);
 	SetInterruptFlag(interruptstatus);

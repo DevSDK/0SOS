@@ -4,6 +4,7 @@ BOOL SetInterruptFlag(BOOL _flag)
 {
     QWORD flag;
     flag = ReadFlags();
+
     if(_flag == TRUE)
         EnableInterrupt();
     else
