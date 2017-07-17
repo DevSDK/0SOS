@@ -230,3 +230,18 @@ void __NextScroll()
 		target[i].bCharactor = ' ';
 
 }
+
+
+char _GetCh()
+{
+	while(1)
+	{
+		if(GetKeyData(&keydata) == TRUE)
+		{
+			if(keydata.Flags & KEY_DOWN)
+			{
+				return keydata.ASCIICode;
+			}
+		}
+	}
+}

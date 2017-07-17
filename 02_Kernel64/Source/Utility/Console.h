@@ -43,8 +43,7 @@ void gotoxy(int _x, int _y);
 
 void _Printf(char* _str, ...);
 void _SPrintf(void* _dst, char* _str, ...);
-
-
+char _GetCh();
 
 void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg);
 void __NextLine();
