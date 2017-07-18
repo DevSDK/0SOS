@@ -1,6 +1,6 @@
 #include "String.h"
 
-BOOL _itoa(int _value, char* _result, int _base)
+BOOL _itoa(long _value, char* _result, int _base)
 {
 	if (_base < 2 || _base > 36) { *_result = '\0'; return FALSE; }
 
@@ -131,6 +131,39 @@ int _ctoi(char _c)
 	case 'Z':
 		return 35;
 	}
+}
+
+BOOL _atoi(const char* _number, long* _value, int _base)
+{
+
+	if (!_number)
+		return FALSE;
+	if (_base < 2 || _base > 36)
+		return FALSE;
+	int sign = 1;
+
+	int i = 0;
+	if (_number[0] == '-')
+	{
+		sign = -1;
+		i = 1;
+	}
+
+	long result = 0;
+	char c = 0;
+	while ((c = _number[i++]) != '\0')
+	{
+		int num = _ctoi(c);
+
+		if (num > _base)
+			return FALSE;
+		result = result * _base + num;
+
+	}
+	*_value = sign*result;
+
+	return TRUE;
+
 }
 
 

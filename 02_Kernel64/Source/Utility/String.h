@@ -2,6 +2,6 @@
 #define __STRING_H__
 #include <Types.h>
 int __StringLength(const char* _str);
-BOOL _itoa(int _value, char* _result, int _base);
-BOOL _atoi(const char* _number, int* _result, int _base);
+BOOL _itoa(long _value, char* _result, int _base);
+BOOL _atoi(const char* _number, long* _value, int _base);
 #endif /*__STRING_H__*/

@@ -197,7 +197,7 @@ void SyncKeyStatusAndLED( BYTE _ScanCode);
 BOOL ConvertScancodeToASCII( BYTE _ScanCode, BYTE* _ASCIICode, BOOL* _flags);
 BOOL ConvertScanCodeWithPushKeyQueue(BYTE _ScanCode);
 BOOL GetKeyData(KEYDATA* _data);
-
+void Reboot();
 
 
 

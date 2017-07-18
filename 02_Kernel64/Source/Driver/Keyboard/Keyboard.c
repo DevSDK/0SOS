@@ -186,3 +186,8 @@ BOOL GetKeyData(KEYDATA* _data)
 	SetInterruptFlag(interruptstatus);
 	return result;
 }
+
+void Reboot()
+{
+	PS2Reboot();
+}

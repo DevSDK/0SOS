@@ -6,10 +6,10 @@
 #include <Descriptor/IDT.h>
 #include <Descriptor/GDT.h>
 #include <Descriptor/Descriptor.h>
-#include <Utility/Console.h>
 #include <Driver/PIC/PIC.h>
 #include <Interrupt/Interrupt.h>
-#include <Utility/Console.h>
+#include <Console/Console.h>
+#include <Console/Shell.h>
 
 void __KERNEL_ENTRY()
 {
@@ -46,38 +46,9 @@ void __KERNEL_ENTRY()
 		_PrintStringXY(5,15, 0x0F,"Keyboard Error.");	
 		while(1);
 	}
-	
-	_Printf("Test %d \n", 100);
 
-	_Printf("Hello My Name is Seok Ho Song\n", 100);
+	StartShell();
 
-	char buf[200];
-	_SPrintf(buf, "\n \n This is Sprintf it Work! \n yes! %d",10);
-
-	_Printf("%s",buf);
-
-	for(int i = 0; i< 30; i++)
-		_Printf("Scroll Test %d\n",i);
-
-	_Printf("\n",buf);
-	_Printf("t\n",buf);
-
-
-	KEYDATA keydata;
-	while(1)
-	{
-			if(GetKeyData(&keydata) == TRUE)
-			{
-				if(keydata.Flags & KEY_DOWN)
-				{
-					temps[0] = keydata.ASCIICode;
-					_PrintStringXY(i++, 17, 0x0C, temps);
-				}
-			}
-
-
-		
-	}
 	
 }
 

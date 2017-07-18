@@ -1,6 +1,19 @@
 #include "Console.h"
-#include "String.h"
+#include <Utility/String.h>
+#include <Driver/Keyboard/Keyboard.h>
+#include <Driver/VGA/IO_VGA.h>
 //Output Format Helper Function.
+
+void __SetConsole_System(CONSOLESYSTEM value)
+{
+	g_console_system.cursor_offset = value.cursor_offset;
+	g_console_system.current_attribute = value.current_attribute;	
+}
+
+CONSOLESYSTEM __GetConsole_System()
+{	
+	return g_console_system;
+}
 
 
 void gotoxy(int _x, int _y)
@@ -8,16 +21,18 @@ void gotoxy(int _x, int _y)
 	g_console_system.cursor_offset = CONSOLE_WIDTH * _y + _x;
 }
 
-
-
-
-
 void __UpdateWithCheckConsoleCursor()
 {
-	if(g_console_system.cursor_offset + 1 >
+	if(g_console_system.cursor_offset + 1 >=
 		CONSOLE_HEIGHT * CONSOLE_WIDTH)	
-		__NextScroll();	
-	g_console_system.cursor_offset++;	
+		{
+			__NextScroll();	
+			g_console_system.cursor_offset = CONSOLE_WIDTH*(CONSOLE_HEIGHT - 1);	
+		}
+		else
+		{
+			g_console_system.cursor_offset++;	
+		}
 }
 
 void __putch(char _ch, BYTE _attribute)
@@ -108,7 +123,7 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 					
 				break;
 			case 'c':
-				ch = (char)(va_arg(_arg,char));
+				ch = (char)(va_arg(_arg,int));
 				if (_type == PRINT_OUTPUT)
 					__putch(ch, g_console_system.current_attribute);
 				else if (_type == PRINT_MEMORY)
@@ -133,6 +148,16 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 			}
 
 		}
+		else if (*ptr == '\t')
+		{
+			if(_type == PRINT_OUTPUT)
+				g_console_system.cursor_offset += (8 - g_console_system.cursor_offset % 8);
+			else if(_type == PRINT_MEMORY)
+			{
+				dst[0] = '\t';
+				dst++;
+			}
+ 		}
 		else if (*ptr == '\n')
 		{
 			if (_type == PRINT_OUTPUT)
@@ -174,6 +199,9 @@ void _Printf(char* _str, ...)
 	va_start(_arg, _str);
 	__VSPrintf(PRINT_OUTPUT, 0, _str, _arg);
 	va_end(_arg);
+
+	_SetCursor(g_console_system.cursor_offset % CONSOLE_WIDTH, 
+				g_console_system.cursor_offset / CONSOLE_WIDTH);
 }
 
 void _SPrintf(void* _dst, char* _str, ...)
@@ -234,6 +262,7 @@ void __NextScroll()
 
 char _GetCh()
 {
+	KEYDATA keydata;
 	while(1)
 	{
 		if(GetKeyData(&keydata) == TRUE)
