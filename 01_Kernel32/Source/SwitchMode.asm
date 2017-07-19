@@ -60,7 +60,7 @@ ModeSwitchAndJumpKernel64:
 	mov eax, 0x100000
 	mov cr3, eax
 	
-	;EFFR Set	
+	;IA_EFER 레지스터의 LME 비트를 활성화	
 	mov ecx, 0xC0000080
 	rdmsr
 	or eax, 0x0100
@@ -72,8 +72,10 @@ ModeSwitchAndJumpKernel64:
 	mov eax, cr0
 	or  eax, 0xE0000000
 	xor eax, 0x60000000
+	;NW(29) = 0, CD(30) = 0, PG(31) = 1 
 	mov cr0, eax
 	
+	;IA-32e 세그먼트 설렉트 후 2MB 영역으로 점프
 	jmp 0x08:0x200000
 	
 	;Not Entry

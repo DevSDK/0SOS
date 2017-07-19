@@ -3,9 +3,12 @@
 #include <Driver/VGA/IO_VGA.h>
 #include <Utility/String.h>
 #include <Console/Console.h>
+/*
+    셸의 엔트리포인트
+    __KernelEntry 에서 초기화가 끝나면 진입하는 함수
+*/
 void StartShell()
 {
-    __InitializeMemoryCheck();
     char CommandBuffer[SHELL_INPUT_BUFFER_SIZE];
     _SetCursor(0, 17);
     int CommandBufferIndex = 0;
@@ -14,7 +17,7 @@ void StartShell()
 	while(1)
 	{
        	BYTE c = _GetCh();
-
+        //백스페이스 처리
         if(c == KEY_BACKSPACE)
         {
             if(CommandBufferIndex > 0)
@@ -22,11 +25,12 @@ void StartShell()
                 int x, y;
                 _GetCursor(&x, &y);
                 int dx = x - Prompt_length;   
+                //커서의 위치에따른 백스페이스를 처리하기 위해 지운 위치에서
+                //커멘드 버퍼를 비우고 다시 출력함
                 for(int i = dx; i < CommandBufferIndex; i++)
                 {
                     CommandBuffer[i] = CommandBuffer[i + 1];
                 }
-                
                 for(int i = 0; i< CONSOLE_WIDTH; i++)
                 {
                     _PrintStringXY(i,y, __GetConsole_System().current_attribute, " ");    
@@ -42,6 +46,7 @@ void StartShell()
                     _SetCursor(x, y);
                
                 CommandBufferIndex --;
+                //마지막 문자일시
                 if(CommandBufferIndex == 0)
                 {
                     _SetCursor(Prompt_length-1, y);                    
@@ -52,6 +57,7 @@ void StartShell()
         else if(c == KEY_ENTER)
         {
             _Printf("\n");
+            //커멘드 버퍼에 커멘드가 있다면, 커멘드를 넘김
             if(CommandBufferIndex > 0)
             {
                 CommandBuffer[CommandBufferIndex] = '\0';
@@ -66,6 +72,7 @@ void StartShell()
         {
             ;
         }
+        //방향키 왼쪽 오른쪽 처리
         else if (c == KEY_ARROW_LEFT)
         {
             int x,y;
@@ -96,11 +103,12 @@ void StartShell()
         }
 	}    
 }
-
+//명령어, 파라미터 입력받아 처리하는 함수
 void ExecuteCommand(const char * CommandBuffer)
 {
     int command_index = 0;
     const int length = __StringLength(CommandBuffer);
+    //커멘드 분리
     for(command_index = 0; command_index < length; command_index++)
     {
         if(CommandBuffer[command_index] == ' ')
@@ -112,8 +120,10 @@ void ExecuteCommand(const char * CommandBuffer)
     for(int i = 0; i <CommandTableSize; i++)
     {
         int command_length = __StringLength(g_ShellCommandTable[i].Command);
+        //커멘드 길이와 안의 요소가 같다면
         if((command_length == command_index) && (_MemCmp(g_ShellCommandTable[i].Command, CommandBuffer, command_index) == 0))
         {
+            //파라미터 문자열부터 전달
             g_ShellCommandTable[i].command_callback(CommandBuffer + command_index + 1);
             return;
         } 
@@ -133,12 +143,26 @@ void Clear()
     _SetCursor(0,0);
 }
 
+void SetAttribute(BYTE _attribute)
+{
+    CONSOLESYSTEM cons =  __GetConsole_System();
+    cons.current_attribute  = _attribute;
+    __SetConsole_System(cons);
+
+    CHARACTER_MEMORY* console = (CHARACTER_MEMORY*) CONSOLE_VIDEO_MEMORY;
+    for(int i = 0 ;  i < CONSOLE_WIDTH * CONSOLE_HEIGHT; i ++)
+    {
+        console[i].bAttribute = _attribute;
+    }
+}
+//파라미터 문자열을 파라미터 리스트에 초기화
 void InitalizeParameter(PARAMETERLIST* _List, const char* _Parameter)
 {
     _List->Buffer = _Parameter;
     _List->Length = __StringLength(_Parameter);
     _List->CurrentPosition = 0; 
 }   
+//다음 파라미터의 문자열을 포인터로 전달하고, 그 파라미터 길이 반환(없으면 0)
 int GetNextParameter(PARAMETERLIST* _List, char* _Parameter_Out)
 {
     int param_length = 0;
@@ -146,6 +170,7 @@ int GetNextParameter(PARAMETERLIST* _List, char* _Parameter_Out)
         return 0;
 
     int i = 0;
+    //파라미터 구분
     for(i = _List->CurrentPosition; i < _List->Length; i++)
     {
         if(_List->Buffer[i] == ' ')
@@ -192,7 +217,86 @@ void Command_Help(const char* _Parameter)
 }
 void Command_Clear(const char* _Parameter)
 {
+
+    char buf[200];
+    PARAMETERLIST list;
+    InitalizeParameter(&list, _Parameter);
+    BOOL IsSetForeground = FALSE;
+    BOOL IsSetBackGround = FALSE;
+    BYTE attribute = 0;
+    while(1)
+    {
+        int length = GetNextParameter(&list, buf);
+        if(length==0)
+            break;
+        if(_MemCmp(buf, "-f", 2) == 0)
+        {
+            int length = GetNextParameter(&list, buf);
+            if(length==0)
+                break;
+            if(_MemCmp(buf, "green", 5) == 0)
+            {
+                attribute |= CONSOLE_FOREGROUND_GREEN;
+            }
+            else if(_MemCmp(buf, "white", 5) == 0)
+            {
+               attribute |= CONSOLE_FOREGROUND_WHITE;         
+            }
+            else if(_MemCmp(buf, "cyan", 4) == 0)
+            {
+               attribute |= CONSOLE_FOREGROUND_CYAN;         
+            }
+            else if(_MemCmp(buf, "black", 5) == 0)
+            {
+               attribute |= CONSOLE_FOREGROUND_BLACK;         
+            }
+            else
+            {
+                _Printf("Not Match Parameter\n");
+                return;
+            }
+            IsSetForeground = TRUE;
+        }
+
+        if(_MemCmp(buf, "-b", 2) == 0)
+        {
+            int length = GetNextParameter(&list, buf);
+            if(length==0)
+                break;
+            if(_MemCmp(buf, "green", 5) == 0)
+            {
+                attribute |= CONSOLE_BACKGROUND_GREEN;
+            }
+            else if(_MemCmp(buf, "white", 5) == 0)
+            {
+               attribute |= CONSOLE_BACKGROUND_WHITE;         
+            }
+            else if(_MemCmp(buf, "cyan", 4) == 0)
+            {
+               attribute |= CONSOLE_BACKGROUND_CYAN;         
+            }
+            else if(_MemCmp(buf, "black", 5) == 0)
+            {
+               attribute |= CONSOLE_BACKGROUND_BLACK;         
+            }
+            else
+            {
+                _Printf("Not Match Parameter\n");
+                return;
+            }
+            IsSetBackGround = TRUE;
+        }
+    }
+    BYTE current_attribute = __GetConsole_System().current_attribute;
+    if(IsSetBackGround == FALSE)
+        attribute |= (current_attribute & 0xF0);
+    if(IsSetForeground == FALSE)
+        attribute |= (current_attribute & 0x0F);
+    
+    SetAttribute(attribute);
     Clear();   
+
+
 }
 
 void Command_ShutDown(const char* _parameter)
@@ -212,9 +316,6 @@ void Command_StringToNumber(const char* _Parameter)
     char Parambuffer[200];
 
     PARAMETERLIST list;
-
-;
-
     InitalizeParameter(&list, _Parameter);
     int count = 0;
     while(1)

@@ -8,7 +8,7 @@ void __DebugIntOutput(int _Vector, int _Count)
     Buffer[6] = _Vector%10 + '0';
     Buffer[8] = _Count/10  + '0';
     Buffer[9] = _Count%10  + '0';  
-    _PrintStringXY(69,0,0x0F,Buffer);
+    _PrintStringXY(69,0,__GetConsole_System().current_attribute,Buffer);
 }
 
 void DefaultExceptionHandler(int _Vector, QWORD _ErrorCode)
@@ -39,7 +39,7 @@ void KeyboardInterruptHandler(int _Vector)
     static int g_KeyboardInterruptCounter = 0;
     g_KeyboardInterruptCounter = (g_KeyboardInterruptCounter + 1)%100;
     __DebugIntOutput(_Vector, g_KeyboardInterruptCounter);
-    
+
     if(PS2CheckOutputBufferNotEmpty() == TRUE)
     {
         BYTE scancode = PS2GetKeyboardScanCode();

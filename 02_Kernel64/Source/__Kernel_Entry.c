@@ -7,10 +7,17 @@
 #include <Descriptor/GDT.h>
 #include <Descriptor/Descriptor.h>
 #include <Driver/PIC/PIC.h>
+#include <Utility/Memory.h>
 #include <Interrupt/Interrupt.h>
 #include <Console/Console.h>
 #include <Console/Shell.h>
 
+/*
+	2MB 영역에 위치한 EntryPoint.s 에서 호출하는 시작 지점
+	GDT, TSS, IDT를 초기화 하고, 프로세서에 등록
+	그 후 인터럽트 PIC 드라이버 및 인터럽트 서비스를 초기화 한다.
+	키보드 인풋 버퍼 초기화 후, 셸의 엔트리포인트로 진입
+*/
 void __KERNEL_ENTRY()
 {
 
@@ -33,9 +40,8 @@ void __KERNEL_ENTRY()
 
 	_PrintStringXY(5,16, 0x0F,"Keyboard Input Buffer Initialize.......................");
 	InitalizeKeyboardBuffer();
-
 	_PrintStringXY(60,16,0x0A,"[SUCCESS]");
-
+    __InitializeMemoryCheck();
 
 	BYTE flags;
 	int i = 14;
@@ -48,8 +54,6 @@ void __KERNEL_ENTRY()
 	}
 
 	StartShell();
-
-	
 }
 
 

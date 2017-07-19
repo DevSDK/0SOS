@@ -3,7 +3,6 @@
 #include <Types.h>
 #include <stdarg.h>
 
-
 #define FORMAT_BUFFER_SIZE 200    
 
 #define PRINT_MEMORY 0x01
@@ -14,7 +13,6 @@
 
 #define CONSOLE_VIDEO_MEMORY    0xB8000
 
-
 #define CONSOLE_BACKGROUND_BLACK    0x00
 #define CONSOLE_BACKGROUND_BLUE     0x10
 #define CONSOLE_BACKGROUND_GREEN    0x20
@@ -24,7 +22,6 @@
 #define CONSOLE_BACKGROUND_BROWN    0x60
 #define CONSOLE_BACKGROUND_WHITE    0x70
 #define CONSOLE_BACKGROUND_BLINK    0x80
-
 
 #define CONSOLE_FOREGROUND_DARKBLACK    0x00
 #define CONSOLE_FOREGROUND_DARKBLUE     0x01
@@ -47,7 +44,8 @@
 #define COLOR_DEFAULT (CONSOLE_BACKGROUND_BLACK|CONSOLE_FOREGROUND_WHITE)
 
 #pragma pack(push, 1)
-typedef struct _Struct_ConsoleCursor
+//콘솔을 제어하는 값
+typedef struct _Struct_ConsoleSystem
 {
     int cursor_offset;
     DWORD current_attribute;
@@ -68,8 +66,6 @@ static CONSOLESYSTEM g_console_system = {0,COLOR_DEFAULT};
 void _PrintStringXY(int _x, int _y, BYTE _Attribute ,const char* _str);
 
 void _PrintChar_offset(int _offset, BYTE _attribute, char _ch);
-
-void gotoxy(int _x, int _y);
 
 void _Printf(char* _str, ...);
 void _SPrintf(void* _dst, char* _str, ...);

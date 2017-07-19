@@ -7,6 +7,7 @@ SECTION .text
 LoadGDTR:
     lgdt[rdi]
     ret
+
 LoadTR:
     ltr di
     ret

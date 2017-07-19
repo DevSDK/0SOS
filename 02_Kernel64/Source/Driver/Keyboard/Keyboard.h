@@ -5,6 +5,8 @@
 #include <UDS/Queue.h>
 #define KEY_SKIPCOUNT_PAUSE	2
 
+
+
 #define KEY_UP		0x00
 #define KEY_DOWN	0x01
 #define KEY_EXTEND	0x02
@@ -55,6 +57,8 @@
 
 #pragma pack(push, 1)
 
+
+//CombinedCode는 쉬프트 등, 조합키
 typedef struct _StructKeyMapEntry
 {
 	BYTE 	NormalCode;
@@ -62,7 +66,7 @@ typedef struct _StructKeyMapEntry
 
 } KeyMapEntry;
 
-
+//키보드의 상태를 저장
 typedef struct _KeyboardSataus
 {
 	BOOL isShiftKeyDown;
@@ -75,6 +79,8 @@ typedef struct _KeyboardSataus
 
 } KeyboardStatus;
 
+
+//Input Bufffer 사용시 쓸 데이터
 typedef struct _KeyDataStruct
 {
 	BYTE ScanCode;

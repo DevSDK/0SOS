@@ -8,6 +8,23 @@ Load GDTR on 0x142000
 */
 
 
+/*
+
+; GDT Entry 필드
+; Limit or Size[32]: 세그먼트 크기
+; Base Address [20]: 세그먼트 시작 주소
+; Type		    [4]: 세그먼트 타입
+; S 			[1]: 디스크립터 타입
+; DPL			[2]: 권한
+; P				[1]: 유효 여부
+; AVL			[1]: 임시
+; L				[1]: IA-32e 에서 64,32 구분
+; D/B			[1]: 기본 연산 크기 (0-16, 1-32)
+; G				[1]: 가중치 1일시 4KB 곱함
+
+*/
+
+
 #define GDT_TYPE_CODE       0x0A    //0b00001010
 #define GDT_TYPE_DATA       0x02    //0b00000010
 #define GDT_TYPE_TSS        0x09    //0b00001001
@@ -80,6 +97,7 @@ typedef struct _Struct_GDT_Entry8
     BYTE High_BaseAddress;  //1Byte
 }GDT_ENTRY8;
 
+
 typedef struct _Struct_GDT_Entry16
 {
     WORD Low_Size;
@@ -95,15 +113,17 @@ typedef struct _Struct_GDT_Entry16
 
 }GDT_ENTRY16;
 
+
+//104Byte
 typedef struct _Struct_TSS_Segment
 {
-    DWORD Reserved;
-    QWORD RSP[3];
-    QWORD Reserved2;
-    QWORD IST[7];
-    QWORD Reserved3;
-    WORD  Reserved4;
-    WORD  IOMapBaseAddress; 
+    DWORD Reserved;     //4Byte
+    QWORD RSP[3];       //8 * 3 = 24Byte
+    QWORD Reserved2;    //8Byte
+    QWORD IST[7];       //8 * 7 = 56Byte
+    QWORD Reserved3;    //8Byte
+    WORD  Reserved4;    //2Byte
+    WORD  IOMapBaseAddress; //2Byte
 }TSS_SEGMENT;
 
 

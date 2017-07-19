@@ -15,12 +15,7 @@ CONSOLESYSTEM __GetConsole_System()
 	return g_console_system;
 }
 
-
-void gotoxy(int _x, int _y)
-{
-	g_console_system.cursor_offset = CONSOLE_WIDTH * _y + _x;
-}
-
+//커서를 업데이트 하고, 스크롤 체크를 함
 void __UpdateWithCheckConsoleCursor()
 {
 	if(g_console_system.cursor_offset + 1 >=
@@ -34,14 +29,13 @@ void __UpdateWithCheckConsoleCursor()
 			g_console_system.cursor_offset++;	
 		}
 }
-
+//한 글자 출력
 void __putch(char _ch, BYTE _attribute)
 {
 	_PrintChar_offset(g_console_system.cursor_offset, _attribute, _ch);
 	__UpdateWithCheckConsoleCursor();
 }
-
-
+//숫자 출력(_base에 따라 다름)
 void __PrintOutInteger(long _value, char* _buffer, int _base)
 {
 	_itoa(_value, _buffer, _base);
@@ -50,7 +44,7 @@ void __PrintOutInteger(long _value, char* _buffer, int _base)
 		__putch(_buffer[i], g_console_system.current_attribute);
 	}
 }
-
+//메모리 대상 숫자 출력
 char* __PrintMemInteger(long _value, char* _dst, int _base)
 {
 	char Buffer[FORMAT_BUFFER_SIZE];
@@ -60,12 +54,13 @@ char* __PrintMemInteger(long _value, char* _dst, int _base)
 	return _dst + length;
 }
 
-
+//_type에 따라 동작하는 Printf 함수
 void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 {
 	char* ptr = str;
 	char Buffer[FORMAT_BUFFER_SIZE];
 	char* dst = (char*)_dst;
+	//입력받은 문자열의 끝까지 반복
 	while (*ptr != '\0')
 	{
 		char output = *ptr;	
@@ -73,9 +68,11 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 		char ch = 0;
 		char* str = 0;
 		QWORD qvalue = 0;
+		//%토큰을 만나면
 		if (*ptr == '%')
 		{
 			ptr++;
+			//뒤에 나오는 문자에 따라 다른 처리(_type에 따라 다름)
 			switch (*ptr)
 			{	
 			case 'd':
@@ -107,7 +104,7 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 
 			case 'p':
 				qvalue = (QWORD)(va_arg(_arg, void*));
-	
+				//포인터의 경우 0x를 붙임
 				if (_type == PRINT_OUTPUT)
 				{
 					__putch('0', g_console_system.current_attribute);
@@ -133,6 +130,8 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 				}
 				break;
 			case 's':
+				//입력받은 문자열에 따른 또다른 포멧 출력을 위해
+				// 타입에 따라 함수 재 호출
 				str = (char*)(va_arg(_arg, char*));
 				if (_type == PRINT_OUTPUT)
 					_Printf(str);
@@ -148,7 +147,7 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 			}
 
 		}
-		else if (*ptr == '\t')
+		else if (*ptr == '\t') //\t 처리
 		{
 			if(_type == PRINT_OUTPUT)
 				g_console_system.cursor_offset += (8 - g_console_system.cursor_offset % 8);
@@ -158,7 +157,7 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 				dst++;
 			}
  		}
-		else if (*ptr == '\n')
+		else if (*ptr == '\n')//\n 처리
 		{
 			if (_type == PRINT_OUTPUT)
 			{
@@ -170,6 +169,7 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 				dst++;
 			}
 		}
+		//특수문자가 아니라면, 일반적인 출력임
 		else
 		{
 			if (_type == PRINT_OUTPUT)
@@ -199,7 +199,6 @@ void _Printf(char* _str, ...)
 	va_start(_arg, _str);
 	__VSPrintf(PRINT_OUTPUT, 0, _str, _arg);
 	va_end(_arg);
-
 	_SetCursor(g_console_system.cursor_offset % CONSOLE_WIDTH, 
 				g_console_system.cursor_offset / CONSOLE_WIDTH);
 }
@@ -211,6 +210,7 @@ void _SPrintf(void* _dst, char* _str, ...)
 	__VSPrintf(PRINT_MEMORY, _dst, _str, _arg);
 	va_end(_arg);
 }
+
 void _PrintStringXY(int _x, int _y, BYTE _Attribute ,const char* _str)
 {
 	CHARACTER_MEMORY* Address = ( CHARACTER_MEMORY* ) CONSOLE_VIDEO_MEMORY;
@@ -235,8 +235,8 @@ void _PrintChar_offset(int _offset, BYTE _attribute, char _ch)
 
 void __NextLine()
 {
-
 	int addoffset =CONSOLE_WIDTH - (g_console_system.cursor_offset%CONSOLE_WIDTH);
+	//커서의 위치가 화면 밖으로 넘어간다면
 	if( g_console_system.cursor_offset + addoffset >= CONSOLE_HEIGHT * CONSOLE_WIDTH)	
 		{
 			__NextScroll();
@@ -248,6 +248,7 @@ void __NextLine()
 
 void __NextScroll()
 {
+	//비디오 메모리를 한줄 밈
 	_MemCpy(CONSOLE_VIDEO_MEMORY, 
 		CONSOLE_VIDEO_MEMORY + CONSOLE_WIDTH* sizeof(CHARACTER_MEMORY), 
 			(CONSOLE_HEIGHT-1) * CONSOLE_WIDTH * sizeof(CHARACTER_MEMORY)  );

@@ -28,18 +28,25 @@
 
 #pragma pack(push, 1)
 
+
+
+
 typedef struct _Struct_IDT_Entry
 {
     WORD Low_BaseAddress;
+    
     WORD SegmentSelector;
-
+    //16Bit Segment Selector
     BYTE IST;
     //3Bit IST, 5Bit set 0
     BYTE FlagsAndType;
     // 4Bit Type, 1 Bit set 0, 2Bit DPL, 1Bit P
     WORD Mid_BaseAddress;
+    //Base Address 16Bit
     DWORD High_BaseAddres;
+    //Base Address 32Bit
     DWORD Reserved;
+    //Reserved 32Bit
 
 }IDT_ENTRY;
 
@@ -48,10 +55,5 @@ typedef struct _Struct_IDT_Entry
 void InitializeIDTTables();
 void SetIDTEntry(IDT_ENTRY* _entry, void* _handler, WORD _Selector, 
                     BYTE _IST, BYTE _Flags, BYTE _Type);
-
-
-void Pt(int _x, int _y, BYTE _Attribute ,const char* _str);
-
-void DummyHandler();
-
+                    
 #endif /* __IDT_H__ */
