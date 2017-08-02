@@ -11,7 +11,7 @@ BOOL SetInterruptFlag(BOOL _flag)
         EnableInterrupt();
     else
         DisableInterrupt();
-
+ 
     if(flag & 0x0200)
         return TRUE;
     else

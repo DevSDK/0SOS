@@ -1,7 +1,7 @@
 #include "Keyboard.h"
 #include <Types.h>
 
-void InitalizeKeyboardBuffer()
+void InitializeKeyboardBuffer()
 {
 	InitializeQueue(&g_KeyBufferQueue, g_KeyBufferMemory, KEY_BUFFER_SIZE, sizeof(KEYDATA));
 }

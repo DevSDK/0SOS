@@ -156,7 +156,7 @@ void SetAttribute(BYTE _attribute)
     }
 }
 //파라미터 문자열을 파라미터 리스트에 초기화
-void InitalizeParameter(PARAMETERLIST* _List, const char* _Parameter)
+void InitializeParameter(PARAMETERLIST* _List, const char* _Parameter)
 {
     _List->Buffer = _Parameter;
     _List->Length = __StringLength(_Parameter);
@@ -220,7 +220,7 @@ void Command_Clear(const char* _Parameter)
 
     char buf[200];
     PARAMETERLIST list;
-    InitalizeParameter(&list, _Parameter);
+    InitializeParameter(&list, _Parameter);
     BOOL IsSetForeground = FALSE;
     BOOL IsSetBackGround = FALSE;
     BYTE attribute = 0;
@@ -316,7 +316,7 @@ void Command_StringToNumber(const char* _Parameter)
     char Parambuffer[200];
 
     PARAMETERLIST list;
-    InitalizeParameter(&list, _Parameter);
+    InitializeParameter(&list, _Parameter);
     int count = 0;
     while(1)
     {
@@ -346,3 +346,113 @@ void Command_StringToNumber(const char* _Parameter)
         count++;
     }
 }
+
+
+
+
+void Command_SetTimer(const char* _Parameter)
+{
+    char ParameterBuffer[200];
+    PARAMETERLIST pList;
+    InitializeParameter(&pList, _Parameter);
+
+    if(GetNextParameter(&pList,ParameterBuffer) == 0)
+    {
+        _Printf("settimer {time(ms)} {interval}\n");
+        return;
+    }
+    long value;
+    if(_atoi(ParameterBuffer, &value, 10) == FALSE)
+    {
+        _Printf("Parameter Decimal number\n");
+        return;
+    }
+
+    if(GetNextParameter(&pList,ParameterBuffer) == 0)
+    {
+        _Printf("settimer {time(ms)} {interval}\n");
+        return;
+    }
+
+    long interval_value;
+    if(_atoi(ParameterBuffer, &interval_value, 10) == FALSE)
+    {
+        _Printf("Parameter is not Decimal number\n");
+        return;
+    }
+    
+    InitializePIT(MS_TO_COUNT(value), interval_value != 0);
+    _Printf("Time = %d ms. Interval = %s Change Complate\n",value, (interval_value == 0)? "False": "True"); 
+
+}
+void Command_PITWait(const char* _Parameter)
+{
+    char ParameterBuffer[200];
+    PARAMETERLIST pList;
+    InitializeParameter(&pList, _Parameter);
+    if(GetNextParameter(&pList,ParameterBuffer)==0)
+    {
+        _Printf("wait {time(ms)}\n");
+        return;
+    }
+    
+    long value;
+    if(_atoi(ParameterBuffer, &value, 10) == FALSE)
+    {
+        _Printf("Parameter is not Decimal number\n");
+        return;
+    }
+
+    _Printf("%d ms Sleep Start...\n", value);
+
+    DisableInterrupt();
+
+    for(long i =0; i < value/30L; i++)
+    {
+        WaitUsingPITCounter0(MS_TO_COUNT(30));
+    }
+
+    WaitUsingPITCounter0(MS_TO_COUNT(value % 30));
+    
+    
+    EnableInterrupt();
+    _Printf("%d ms Sleep Complate.\n", value);
+    InitializePIT(MS_TO_COUNT(1), TRUE); 
+}
+void Command_ReadTimeStamp(const char* _Parameter)
+{
+    QWORD tsc =  ReadTSC();
+    _Printf("Time Stamp Counter = %q \n",tsc);
+}
+void Command_CPUSpeed(const char* _Parameter)
+{
+    QWORD last_tsc;
+    QWORD total_tsc = 0;
+    _Printf("Now Calculate.");
+    DisableInterrupt();
+    for(int i = 0; i < 200; i++)
+    {
+        last_tsc = ReadTSC();
+        WaitUsingPITCounter0(MS_TO_COUNT(50));
+        total_tsc+= ReadTSC() - last_tsc;
+        _Printf(".");
+    }
+    InitializePIT(MS_TO_COUNT(1),TRUE);
+    EnableInterrupt();
+    _Printf("\n Cpu Clock = %d MHz \n", total_tsc/10/1000/1000);
+}
+void Command_ShowDateTime(const char* _Parameter)
+{
+    BYTE Second, Minute, Hour;
+    BYTE DayOfWeek, DayOfMonth, Month;
+    WORD Year;
+
+    ReadRTCTime(&Hour, &Minute, &Second);
+    ReadRTCDate(&Year,&Month,&DayOfMonth, &DayOfWeek);
+
+    _Printf("Date: %d-%d-%d %s, ", Year, Month, DayOfMonth, ConvertDayOfWeekString(DayOfWeek));
+    _Printf("Time: %d:%d:%d\n", Hour, Minute, Second);
+    
+
+}
+

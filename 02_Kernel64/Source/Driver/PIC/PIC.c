@@ -4,7 +4,7 @@
 void InitializePIC()
 {
 
-    //Initalize Master PIC
+    //Initialize Master PIC
     //ICW1 IC4 = 1
     PortIO_OutByte(PIC_MASTER_PORT_1, 0x11);
     //ICW2 Interrupt Vector Offset = 0x20 (32)
@@ -14,7 +14,7 @@ void InitializePIC()
     //ICW4 SFNM = 0 BUF = 0 M/S = 0 AEOI = 0 uPM = 1 
     PortIO_OutByte(PIC_MASTER_PORT_2, 0x01);
     
-    //Initalize Slave PIC
+    //Initialize Slave PIC
     //ICW1 IC4 = 1
     PortIO_OutByte(PIC_SLAVE_PORT_1, 0x11);
     //ICW2 Interrupt Vector Offset = 0x28

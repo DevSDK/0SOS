@@ -194,7 +194,7 @@ static KeyMapEntry 		g_KeyMapScanTable[KEYMAP_TABLE_SIZE] = {
 
 };
 
-void InitalizeKeyboardBuffer();
+void InitializeKeyboardBuffer();
 BOOL IsAlphabetScanCode( BYTE _ScanCcode );
 BOOL IsNumberOrSymbolScanCode( BYTE _ScanCode );
 BOOL IsNumberPadScanCode(BYTE _ScanCode);

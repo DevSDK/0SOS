@@ -7,12 +7,12 @@ BOOL _itoa(long _value, char* _result, int _base)
 	char* ptr = _result, *ptr1 = _result, tmp_char;
 	int tmp_value;
 
-
 	//음수 양수 상관없이 처리가 가능함.
 	do {
 		tmp_value = _value;
 		_value /= _base;
 		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - _value * _base)];
+
 	} while (_value);
 
 	//Sign 처리
@@ -25,6 +25,35 @@ BOOL _itoa(long _value, char* _result, int _base)
 		*ptr1++ = tmp_char;
 	}
 	return TRUE;
+
+}
+
+
+
+BOOL _u_itoa(QWORD _value, char* _result, unsigned int _base)
+{
+	if (_base < 2 || _base > 36) { *_result = '\0'; return FALSE; }
+
+	char* ptr = _result, *ptr1 = _result, tmp_char;
+	unsigned long tmp_value;
+
+	//음수 양수 상관없이 처리가 가능함.
+	do {
+		tmp_value = _value;
+		_value /= _base;
+		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz"[35 + (tmp_value - _value * _base)];
+
+	} while (_value);
+	*ptr-- = '\0';
+	//Reverse
+	while (ptr1 < ptr) {
+		tmp_char = *ptr;
+		*ptr-- = *ptr1;
+		*ptr1++ = tmp_char;
+	}
+
+	return TRUE;
+
 }
 
 

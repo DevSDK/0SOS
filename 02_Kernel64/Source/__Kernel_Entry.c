@@ -32,14 +32,14 @@ void __KERNEL_ENTRY()
 	InitializeIDTTables();
 	LoadIDTR(IDTR_POINTER);
 	_PrintStringXY(60,14,0x0A,"[SUCCESS]");
-	_PrintStringXY(5,15, 0x0F,"PIC Driver And Interrupt Service Initalize.............");
+	_PrintStringXY(5,15, 0x0F,"PIC Driver And Interrupt Service Initialize............");
 	InitializePIC();
 	MaskPICInterrupt(0);
 	EnableInterrupt();
 	_PrintStringXY(60,15,0x0A,"[SUCCESS]");
 
 	_PrintStringXY(5,16, 0x0F,"Keyboard Input Buffer Initialize.......................");
-	InitalizeKeyboardBuffer();
+	InitializeKeyboardBuffer();
 	_PrintStringXY(60,16,0x0A,"[SUCCESS]");
     __InitializeMemoryCheck();
 

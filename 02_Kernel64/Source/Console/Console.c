@@ -36,7 +36,7 @@ void __putch(char _ch, BYTE _attribute)
 	__UpdateWithCheckConsoleCursor();
 }
 //숫자 출력(_base에 따라 다름)
-void __PrintOutInteger(long _value, char* _buffer, int _base)
+void  __PrintOutInteger(long _value, char* _buffer, int _base)
 {
 	_itoa(_value, _buffer, _base);
 	for (int i = 0; _buffer[i] != '\0'; i++)
@@ -44,6 +44,26 @@ void __PrintOutInteger(long _value, char* _buffer, int _base)
 		__putch(_buffer[i], g_console_system.current_attribute);
 	}
 }
+
+void  __U_PrintOutInteger(QWORD _value, char* _buffer, unsigned int _base)
+{
+	_u_itoa(_value, _buffer, _base);
+	for (int i = 0; _buffer[i] != '\0'; i++)
+	{
+		__putch(_buffer[i], g_console_system.current_attribute);
+	}
+}
+
+char* __U_PrintMemInteger(QWORD _value, char* _dst, int _base)
+{
+	char Buffer[FORMAT_BUFFER_SIZE];
+	_u_itoa(_value, Buffer, _base);
+	int length = __StringLength(Buffer);
+	_MemCpy(_dst, Buffer, length);
+	return _dst + length;
+
+} 
+
 //메모리 대상 숫자 출력
 char* __PrintMemInteger(long _value, char* _dst, int _base)
 {
@@ -52,7 +72,8 @@ char* __PrintMemInteger(long _value, char* _dst, int _base)
 	int length = __StringLength(Buffer);
 	_MemCpy(_dst, Buffer, length);
 	return _dst + length;
-}
+
+} 
 
 //_type에 따라 동작하는 Printf 함수
 void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
@@ -68,6 +89,7 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 		char ch = 0;
 		char* str = 0;
 		QWORD qvalue = 0;
+		long ldate = 0;
 		//%토큰을 만나면
 		if (*ptr == '%')
 		{
@@ -91,13 +113,21 @@ void __VSPrintf(BYTE _type, const void* _dst, char* str, va_list _arg)
 				break;
 			case 'x':
 				value = (int)(va_arg(_arg, int));
-
 				if (_type == PRINT_OUTPUT)
 					__PrintOutInteger(value, Buffer, 16);
 				else if (_type == PRINT_MEMORY)
 					dst = __PrintMemInteger(value, dst, 16);
 					
 				break;
+
+			case 'q':
+				qvalue = (QWORD)(va_arg(_arg, QWORD));
+				if (_type == PRINT_OUTPUT)
+					__U_PrintOutInteger(qvalue, Buffer, 10);
+				else if (_type == PRINT_MEMORY)
+					dst = __U_PrintMemInteger(qvalue, dst, 10);
+				break;
+				
 				//case 'f':
 				//case 'g':
 				//TODO: Floating Point
@@ -210,6 +240,8 @@ void _SPrintf(void* _dst, char* _str, ...)
 	__VSPrintf(PRINT_MEMORY, _dst, _str, _arg);
 	va_end(_arg);
 }
+
+
 
 void _PrintStringXY(int _x, int _y, BYTE _Attribute ,const char* _str)
 {
