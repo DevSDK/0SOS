@@ -259,7 +259,6 @@ void _PrintStringXY(int _x, int _y, BYTE _Attribute ,const char* _str)
 void _PrintChar_offset(int _offset, BYTE _attribute, char _ch)
 {
 	CHARACTER_MEMORY* Address = ( CHARACTER_MEMORY* ) CONSOLE_VIDEO_MEMORY;
-	int i = 0;
 	Address+= _offset;
 	Address[0].bCharactor = _ch;
 	Address[0].bAttribute = _attribute;

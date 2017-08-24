@@ -7,6 +7,7 @@
 #include <Driver/Time/PIT.h>
 #include <Driver/Time/RTC.h>
 #include <Driver/Time/TSC.h>
+#include <Tasking/Task.h>
 
 #define SHELL_INPUT_BUFFER_SIZE 500
 #define SHELL_PROMPT_MESSAGE    "0SOS>"
@@ -42,6 +43,7 @@ void Command_PITWait(const char* _Parameter);
 void Command_ReadTimeStamp(const char* _Parameter);
 void Command_CPUSpeed(const char* _Parameter);
 void Command_ShowDateTime(const char* _Parameter);
+void Command_CreateTak(const char* _Parameter);
 //---------------------------------------------------*
 static SHELLCOMMAND g_ShellCommandTable[] = { 
     {"clear", "clear the consol\n-f {white, green, cyan,black} front color\n-b {black, white, blue} back ground\n"
@@ -54,7 +56,8 @@ static SHELLCOMMAND g_ShellCommandTable[] = {
     {"wait", "Wait ms Use PIT. \n wait {time(ms)} \n", Command_PITWait},
     {"rdtsc", "Read Time Stamp Counter", Command_ReadTimeStamp},
     {"cpuspd", "CPU Speed", Command_CPUSpeed},
-    {"date", "Show DateTime", Command_ShowDateTime}
+    {"date", "Show DateTime", Command_ShowDateTime},
+    {"createtask", "Create Task", Command_CreateTask}
 };
 
 void Clear();

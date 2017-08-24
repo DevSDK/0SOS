@@ -3,6 +3,7 @@
 #include <Driver/VGA/IO_VGA.h>
 #include <Utility/String.h>
 #include <Console/Console.h>
+
 /*
     셸의 엔트리포인트
     __KernelEntry 에서 초기화가 끝나면 진입하는 함수
@@ -456,3 +457,33 @@ void Command_ShowDateTime(const char* _Parameter)
 
 }
 
+static TCB g_task[2] = {0.};
+static QWORD test_stack[1024] = {0,};
+
+void TaskTask()
+{
+    int iteration = 0;
+    while(1)
+    {
+        _Printf("[%d] Message from test task Press any key to switching\n",iteration++);
+        _GetCh();
+        ContextSwitch(&g_task[1].Context, &g_task[0].Context);
+    }
+
+}
+
+void Command_CreateTask(const char* _Parameter)
+{
+    KEYDATA key;
+    InitTask(&g_task[1],1,0, TaskTask, test_stack, sizeof(test_stack));
+    
+    int iteration = 0;
+    while(1)
+    {
+        _Printf("[%d] message from shell Press any key to switching\n", iteration++);
+        if(_GetCh() =='q')
+            break;
+        ContextSwitch(&g_task[0].Context, &g_task[1].Context);  
+        }
+
+}

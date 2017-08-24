@@ -2,7 +2,7 @@
 #define __KEYBOARD_H_
 #include <Types.h>
 #include "PS2Keyboard.h"
-#include <UDS/Queue.h>
+#include <GDS/Queue.h>
 #define KEY_SKIPCOUNT_PAUSE	2
 
 
