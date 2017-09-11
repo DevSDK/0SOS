@@ -1,7 +1,11 @@
 #include "Task.h"
 #include <Utility/Memory.h>
 #include <Descriptor/GDT.h>
-void InitTask(TCB* _Tcb, QWORD _ID, QWORD _Flags, QWORD _EntryPointAddress, void* _StackAddress, QWORD _StackSize)
+
+static SCHEDULER g_Scheduler;
+static TCB_POOL_MANAGER g_TcbPoolManager;
+
+void InitTask(TCB* _Tcb, QWORD _Flags, QWORD _EntryPointAddress, void* _StackAddress, QWORD _StackSize)
 {
     _MemSet(_Tcb->Context.Registers, 0, sizeof(_Tcb->Context.Registers));
     
@@ -24,8 +28,69 @@ void InitTask(TCB* _Tcb, QWORD _ID, QWORD _Flags, QWORD _EntryPointAddress, void
     // 0  0  0  0  0  0  1  0  0  0  0  0  0  0  0  0
     _Tcb->Context.Registers[CONTEXT_OFFSET_RFLAG] |= 0x0200;   
     //Setup TCB Block
-    _Tcb->ID            = _ID;
     _Tcb->StackAddress  = _StackAddress;
     _Tcb->StackSize     = _StackSize;
     _Tcb->Flags         = _Flags;
  }
+
+ void InitializeTCBPool()
+ {
+    _MemSet(&(g_TcbPoolManager), 0, sizeof(g_TcbPoolManager));
+    g_TcbPoolManager.StartAddress = (TCB*)TASK_TCBPOOL_ADDRESS;
+    _MemSet(TASK_TCBPOOL_ADDRESS,0,sizeof(TCB) * TASK_TCBPOOL_COUNT);
+    for(int i = 0; i < TASK_TCBPOOL_COUNT; i++)
+        g_TcbPoolManager.StartAddress[i].list_header.ID = i;
+
+    g_TcbPoolManager.MaxCount = TASK_TCBPOOL_COUNT;
+    g_TcbPoolManager.AllocatedCount = 1;
+}
+ //63 ------------ 55 -------0
+ // 0 0 0 0 0 0 0 0 | address|
+// 00000000 = Not Allocate
+// 00000001 = Allocated
+ TCB* AllocateTCB()
+ {
+     TCB* EmptyTCB;
+    if(g_TcbPoolManager.Count == g_TcbPoolManager.MaxCount)
+        return NULL;
+    
+    for(int i = 0; i < g_TcbPoolManager.MaxCount; i++)
+    {
+        if( (g_TcbPoolManager.StartAddress[i].list_header.ID >> 54) == TASK_FREE )
+        {
+            EmptyTCB = &(g_TcbPoolManager.StartAddress[i]);
+            break;
+        }
+    }
+
+    EmptyTCB->list_header.ID = ((QWORD) g_TcbPoolManager.AllocatedCount ) + (TASK_FREE << 54);
+    g_TcbPoolManager.Count++;
+    g_TcbPoolManager.AllocatedCount++;
+    
+    if(g_TcbPoolManager.AllocatedCount ==0)
+        g_TcbPoolManager.AllocatedCount = 1;
+    
+    return EmptyTCB;
+}
+void FreeTCB(QWORD _ID)
+{
+    int index = _ID & 0xFFFFFFFFFFFF;
+    _MemSet(&(g_TcbPoolManager.StartAddress[index].Context), 0, sizeof(CONTEXT));
+    g_TcbPoolManager.StartAddress[index].list_header.ID = index;
+    g_TcbPoolManager.Count--;
+}
+TCB* CreateTask(QWORD _Flags, QWORD _EntryPointAddress)
+{
+    TCB* task = AllocateTCB();
+
+    if(task == NULL)
+        return NULL;
+
+    void* StackAddress = (void*)(TASK_STACK_ADRESS + 
+        (TASK_STACK_SIZE * (task->list_header.ID & 0xFFFFFFFFFFFF)))
+    
+    InitTask(task,  _Flags, _EntryPointAddress, StackAddress, TASK_STACK_SIZE);
+    AddTaskToScheduler(task);
+    return task;
+}
+ 

@@ -451,7 +451,7 @@ void Command_ShowDateTime(const char* _Parameter)
     ReadRTCTime(&Hour, &Minute, &Second);
     ReadRTCDate(&Year,&Month,&DayOfMonth, &DayOfWeek);
 
-    _Printf("Date: %d-%d-%d %s, ", Year, Month, DayOfMonth, ConvertDayOfWeekString(DayOfWeek));
+    ("Date: %d-%d-%d %s, ", Year, Month, DayOfMonth, ConvertDayOfWeekString(DayOfWeek));
     _Printf("Time: %d:%d:%d\n", Hour, Minute, Second);
     
 
@@ -475,7 +475,7 @@ void TaskTask()
 void Command_CreateTask(const char* _Parameter)
 {
     KEYDATA key;
-    InitTask(&g_task[1],1,0, TaskTask, test_stack, sizeof(test_stack));
+    InitTask(&g_task[1], 0, TaskTask, test_stack, sizeof(test_stack));
     
     int iteration = 0;
     while(1)

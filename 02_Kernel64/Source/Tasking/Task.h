@@ -32,24 +32,68 @@
 #define CONTEXT_OFFSET_RSP          22
 #define CONTEXT_OFFSET_SS           23
 
+#define TASK_TCBPOOL_ADDRESS        0x800000
+#define TASK_TCBPOOL_COUNT          0x4096
+
+#define TASK_STACK_ADRESS           (TASK_TCBPOOL_ADDRESS + sizeof(TCB) * TASK_TCBPOOL_COUNT)
+#define TASK_STACK_SIZE             8192;
+
+#define TASK_INVALID_ID             0xFFFFFFFFFFFFFFFF
+
+#define TASK_TIME                   5
+
+#define TASK_FREE                   0x0
+#define TASK_ALLOCATED              0x1
+
+
 #pragma pack(push,1)
 typedef struct __CONTEXT_STRUCT
 {
+    //RegisterData
     QWORD Registers[CONTEXT_REGISTER_COUNT];
 } CONTEXT;
 
+//Include Linked List Header.
 typedef struct __TCB_STRUCT
 {
-    CONTEXT Context;
-    QWORD ID;
-    QWORD Flags;
+    LLIST_NODE_HEADER   list_header;
+    QWORD               Flags;
+    CONTEXT             Context;
 
-    void* StackAddress;
-    QWORD StackSize;
+    void*               StackAddress;
+    QWORD               StackSize;
 } TCB;
+
+//Management TCB Poll
+typedef struct __TCB_POOL_MANAGER
+{
+    TCB* StartAddress;
+    int MaxCount;
+    int Count;
+
+    int AllocatedCount;
+}TCB_POOL_MANAGER;
+
+typedef struct __SchedulerStruct
+{
+    TCB* Current_Runing_Task;
+
+    int CpuTime;
+    
+    LLIST task_list;
+}SCHEDULER;
+
 #pragma pack(pop)
 
-void InitTask(TCB* _Tcb, QWORD _ID, QWORD _Flags, QWORD _EntryPointAddress, void* _StackAddress, QWORD _StackSize);
+/// TASK POOL & TASK 
+
+
+void InitTask(TCB* _Tcb, QWORD _Flags, QWORD _EntryPointAddress, void* _StackAddress, QWORD _StackSize);
+void InitializeTCBPool();
+TCB* AllocateTCB();
+void FreeTCB(QWORD _ID);
+TCB* CreateTask(QWORD _Flags, QWORD _EntryPointAddress);
+
 
 //Link Assembly File
 void ContextSwitch(CONTEXT* _CurrentContext, CONTEXT* _NextContext);
