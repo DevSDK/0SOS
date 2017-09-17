@@ -1,14 +1,15 @@
 #include "LinkedList.h"
-
-void InitializeLList(const LLIST* _Ld)
+#include <Console/Console.h>
+void InitializeLList(LLIST* _Ld)
 {
     _Ld->Count = 0;
     _Ld->FirstNode = NULL;
     _Ld->LastNode  = NULL;   
+    
 }
 
-void Push_Back_LList(const LLIST* _Ld, void* _Item)
-{
+void Push_Back_LList(LLIST* _Ld, void* _Item)
+{   
     LLIST_NODE_HEADER* header = (LLIST_NODE_HEADER*)_Item;
     header->NextNode = NULL;
     if(_Ld->FirstNode == NULL)
@@ -18,13 +19,12 @@ void Push_Back_LList(const LLIST* _Ld, void* _Item)
         _Ld->Count     = 1;
         return;
     }
-
     header = (LLIST_NODE_HEADER*)_Ld->LastNode;
     header->NextNode = _Item;
     _Ld->LastNode = _Item;
     _Ld->Count++;
 }
-void Push_Front_LList(const LLIST* _Ld, void* _Item)
+void Push_Front_LList(LLIST* _Ld, void* _Item)
 {
     LLIST_NODE_HEADER* header = (LLIST_NODE_HEADER*)_Item;
     header->NextNode = _Ld->FirstNode;
@@ -38,7 +38,7 @@ void Push_Front_LList(const LLIST* _Ld, void* _Item)
     _Ld->FirstNode = _Item;
     _Ld->Count++;
 }
-void* Remove_LList(const LLIST* _Ld, QWORD _ID)
+void* Remove_LList(LLIST* _Ld, QWORD _ID)
 {
     LLIST_NODE_HEADER* pre_headaer = (LLIST_NODE_HEADER*)_Ld->FirstNode;
 
@@ -46,7 +46,6 @@ void* Remove_LList(const LLIST* _Ld, QWORD _ID)
     {
         if(iter_header->ID == _ID)
         {
-
             if((iter_header == _Ld->FirstNode) && (iter_header == _Ld->LastNode) )
             {
                 _Ld->FirstNode = NULL;
@@ -54,12 +53,14 @@ void* Remove_LList(const LLIST* _Ld, QWORD _ID)
             }
             else if(iter_header == _Ld->FirstNode)
             {
-                _Ld->FirstNode = header->NextNode;
+                _Ld->FirstNode = iter_header->NextNode;
+                
             }
             else if(iter_header == _Ld->LastNode)
             {
                 _Ld ->LastNode = pre_headaer;
-            }
+
+            } 
             else
             {
                 pre_headaer->NextNode = iter_header->NextNode;
@@ -76,14 +77,14 @@ void* Remove_Front_LList(const LLIST* _Ld)
 {
     if(_Ld->Count == 0)
         return NULL;
-    LLIST_NODE_HEADER* headr = (LLIST_NODE_HEADER*)_Ld->FirstNode;
+    LLIST_NODE_HEADER* header = (LLIST_NODE_HEADER*)_Ld->FirstNode;
     return Remove_LList(_Ld, header->ID);
 }
 void* Remove_Back_LList(const LLIST* _Ld)
 {
     if(_Ld->Count == 0)
         return NULL;
-    LLIST_NODE_HEADER* headr = (LLIST_NODE_HEADER*)_Ld->LastNode;
+    LLIST_NODE_HEADER* header    = (LLIST_NODE_HEADER*)_Ld->LastNode;
     return Remove_LList(_Ld, header->ID);
 }
 

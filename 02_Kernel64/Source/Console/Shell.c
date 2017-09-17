@@ -3,6 +3,7 @@
 #include <Driver/VGA/IO_VGA.h>
 #include <Utility/String.h>
 #include <Console/Console.h>
+#include <Scheduling/Scheduler.h>
 
 /*
     셸의 엔트리포인트
@@ -11,7 +12,7 @@
 void StartShell()
 {
     char CommandBuffer[SHELL_INPUT_BUFFER_SIZE];
-    _SetCursor(0, 17);
+    _SetCursor(0, 18);
     int CommandBufferIndex = 0;
     _Printf(SHELL_PROMPT_MESSAGE);
     const int Prompt_length = sizeof(SHELL_PROMPT_MESSAGE);
@@ -457,33 +458,103 @@ void Command_ShowDateTime(const char* _Parameter)
 
 }
 
-static TCB g_task[2] = {0.};
-static QWORD test_stack[1024] = {0,};
-
-void TaskTask()
+void TestTask1()
 {
-    int iteration = 0;
+    BYTE data;
+    int i =  0, ix =0, iy = 0, iMargin;
+    CHARACTER_MEMORY* video = (CHARACTER_MEMORY*)CONSOLE_VIDEO_MEMORY;
+    TCB* task = GetCurrentRunningTask();
+    iMargin = (task->list_header.ID & 0xFFFFFFFFFFFFFF) %10;
     while(1)
     {
-        _Printf("[%d] Message from test task Press any key to switching\n",iteration++);
-        _GetCh();
-        ContextSwitch(&g_task[1].Context, &g_task[0].Context);
+        switch(i)
+        {
+            case 0:
+                ix++;
+                if(ix>=(CONSOLE_WIDTH - iMargin))
+                    i = 1;
+                break;
+            case 1:
+                iy++;
+                if(iy>=(CONSOLE_WIDTH - iMargin))
+                    i = 2;
+                break;    
+            case 2:
+                ix--;
+                if(iy<iMargin)
+                    i = 3;
+                break;
+            case 3:
+                iy--;
+                if(iy < iMargin)
+                    i = 0;
+                break;
+        }   
+        video[iy * CONSOLE_WIDTH + ix].bCharactor = data;
+        video[iy * CONSOLE_WIDTH + ix].bAttribute = data & 0x0F;
+        data++;
+        Schedule();
     }
+    
 
 }
 
-void Command_CreateTask(const char* _Parameter)
+void TestTask2()
 {
-    KEYDATA key;
-    InitTask(&g_task[1], 0, TaskTask, test_stack, sizeof(test_stack));
+    int i =0, iOffset;
     
-    int iteration = 0;
+    CHARACTER_MEMORY* video = (CHARACTER_MEMORY *)CONSOLE_VIDEO_MEMORY;
+    TCB* task = GetCurrentRunningTask();
+    char data[4] = {'-','\\','/','|'};
+
+    iOffset = (task->list_header.ID & 0xFFFFFFFFFFFFFF ) * 2;
+    iOffset = CONSOLE_WIDTH * CONSOLE_HEIGHT - (iOffset % (CONSOLE_WIDTH * CONSOLE_HEIGHT));
+
     while(1)
     {
-        _Printf("[%d] message from shell Press any key to switching\n", iteration++);
-        if(_GetCh() =='q')
+        video[iOffset].bCharactor = data[i %4];
+        video[iOffset].bAttribute = (iOffset % 15) + 1;
+
+        i++;
+        Schedule();
+    }
+}
+
+
+
+
+void Command_CreateTask(const char* _Parameter)
+{
+    PARAMETERLIST parameter_list;
+    char type[30];
+    char count[30];
+    InitializeParameter(&parameter_list, _Parameter);
+    GetNextParameter(&parameter_list, type);
+    GetNextParameter(&parameter_list, count);
+
+    long idx = 0;
+    long cnt = 0;
+    _atoi(type, &idx,10);
+    _atoi(count, &cnt,10);
+    int i = 0; 
+    switch (idx)
+    {
+        case 1:
+            for( i =0; i<cnt; i++)
+            {
+                if(CreateTask(0,(QWORD)TestTask1) == NULL)
+                    break;
+            }      
+            _Printf("Task 1 %d Created\n", i);
             break;
-        ContextSwitch(&g_task[0].Context, &g_task[1].Context);  
-        }
+        case 2:
+            for( i =0; i<cnt; i++)
+            {
+                if(CreateTask(0,(QWORD)TestTask2) == NULL)
+                    break;
+            }      
+            _Printf("Task 2 %d Created\n", i);
+            break;
+    }
 
 }

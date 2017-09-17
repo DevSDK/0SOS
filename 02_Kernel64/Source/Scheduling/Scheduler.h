@@ -5,6 +5,9 @@
 #include <Tasking/Task.h>
 
 
+#define TASK_TIME                   5
+
+
 void InitializeScheduler();
 void SetCurrentRunningTask(TCB* _Tcb);
 TCB* GetCurrentRunningTask();

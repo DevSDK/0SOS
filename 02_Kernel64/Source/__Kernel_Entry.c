@@ -11,6 +11,8 @@
 #include <Interrupt/Interrupt.h>
 #include <Console/Console.h>
 #include <Console/Shell.h>
+#include <Scheduling/Scheduler.h>
+
 
 /*
 	2MB 영역에 위치한 EntryPoint.s 에서 호출하는 시작 지점
@@ -32,15 +34,22 @@ void __KERNEL_ENTRY()
 	InitializeIDTTables();
 	LoadIDTR(IDTR_POINTER);
 	_PrintStringXY(60,14,0x0A,"[SUCCESS]");
-	_PrintStringXY(5,15, 0x0F,"PIC Driver And Interrupt Service Initialize............");
+
+	_PrintStringXY(5,15, 0x0F,"Initialize Scheduler & Task Pool ......................");	
+	InitializeScheduler();
+	InitializePIT(MS_TO_COUNT(1),1);
+	
+	_PrintStringXY(60,15,0x0A,"[SUCCESS]");	
+	
+	_PrintStringXY(5,16, 0x0F,"PIC Driver And Interrupt Service Initialize............");
 	InitializePIC();
 	MaskPICInterrupt(0);
 	EnableInterrupt();
-	_PrintStringXY(60,15,0x0A,"[SUCCESS]");
-
-	_PrintStringXY(5,16, 0x0F,"Keyboard Input Buffer Initialize.......................");
-	InitializeKeyboardBuffer();
 	_PrintStringXY(60,16,0x0A,"[SUCCESS]");
+
+	_PrintStringXY(5,17, 0x0F,"Keyboard Input Buffer Initialize.......................");
+	InitializeKeyboardBuffer();
+	_PrintStringXY(60,17,0x0A,"[SUCCESS]");
     __InitializeMemoryCheck();
 
 	BYTE flags;

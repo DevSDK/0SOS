@@ -1,8 +1,8 @@
 #include "Task.h"
 #include <Utility/Memory.h>
 #include <Descriptor/GDT.h>
+#include <Console/Console.h>
 
-static SCHEDULER g_Scheduler;
 static TCB_POOL_MANAGER g_TcbPoolManager;
 
 void InitTask(TCB* _Tcb, QWORD _Flags, QWORD _EntryPointAddress, void* _StackAddress, QWORD _StackSize)
@@ -44,29 +44,29 @@ void InitTask(TCB* _Tcb, QWORD _Flags, QWORD _EntryPointAddress, void* _StackAdd
     g_TcbPoolManager.MaxCount = TASK_TCBPOOL_COUNT;
     g_TcbPoolManager.AllocatedCount = 1;
 }
+ //       STATE
  //63 ------------ 55 -------0
  // 0 0 0 0 0 0 0 0 | address|
-// 00000000 = Not Allocate
-// 00000001 = Allocated
+
  TCB* AllocateTCB()
  {
-     TCB* EmptyTCB;
+    TCB* EmptyTCB;
     if(g_TcbPoolManager.Count == g_TcbPoolManager.MaxCount)
         return NULL;
-    
     for(int i = 0; i < g_TcbPoolManager.MaxCount; i++)
     {
-        if( (g_TcbPoolManager.StartAddress[i].list_header.ID >> 54) == TASK_FREE )
+
+        if((g_TcbPoolManager.StartAddress[i].list_header.ID & TASK_STATE_MASK) == TASK_FREE )
         {
             EmptyTCB = &(g_TcbPoolManager.StartAddress[i]);
             break;
         }
     }
-
-    EmptyTCB->list_header.ID = ((QWORD) g_TcbPoolManager.AllocatedCount ) + (TASK_FREE << 54);
+    QWORD id = (QWORD) (g_TcbPoolManager.AllocatedCount);
+    EmptyTCB->list_header.ID = (( id | TASK_ALLOCATED));
     g_TcbPoolManager.Count++;
     g_TcbPoolManager.AllocatedCount++;
-    
+
     if(g_TcbPoolManager.AllocatedCount ==0)
         g_TcbPoolManager.AllocatedCount = 1;
     
@@ -74,7 +74,7 @@ void InitTask(TCB* _Tcb, QWORD _Flags, QWORD _EntryPointAddress, void* _StackAdd
 }
 void FreeTCB(QWORD _ID)
 {
-    int index = _ID & 0xFFFFFFFFFFFF;
+    QWORD index = _ID & TASK_INDEX_MASK;
     _MemSet(&(g_TcbPoolManager.StartAddress[index].Context), 0, sizeof(CONTEXT));
     g_TcbPoolManager.StartAddress[index].list_header.ID = index;
     g_TcbPoolManager.Count--;
@@ -85,11 +85,11 @@ TCB* CreateTask(QWORD _Flags, QWORD _EntryPointAddress)
 
     if(task == NULL)
         return NULL;
-
+        
     void* StackAddress = (void*)(TASK_STACK_ADRESS + 
-        (TASK_STACK_SIZE * (task->list_header.ID & 0xFFFFFFFFFFFF)))
-    
-    InitTask(task,  _Flags, _EntryPointAddress, StackAddress, TASK_STACK_SIZE);
+        (TASK_STACK_SIZE * (task->list_header.ID & TASK_INDEX_MASK)));
+        InitTask(task,  _Flags, _EntryPointAddress, StackAddress, TASK_STACK_SIZE);
+
     AddTaskToScheduler(task);
     return task;
 }

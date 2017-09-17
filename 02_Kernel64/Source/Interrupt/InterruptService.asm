@@ -4,6 +4,8 @@
 SECTION .text
 
 extern DefaultExceptionHandler,DefaultInterruptHandler, KeyboardInterruptHandler
+extern TimerInterruptHandler
+
 
 global ISRDividError,ISRDebug,ISRNMI,ISRBreakPoint,ISROverflow
 global ISRBoundRangeExceeded,ISRInvalidOpCode,ISRDeviceNotAvailable
@@ -223,7 +225,7 @@ ISRDefaultException:
 ISRTimer:
     SAVECONTEXT
     mov rdi, 32
-    call DefaultInterruptHandler
+    call TimerInterruptHandler
     LOADCONTEXT
     iretq
 ISRPS2Keyboard:

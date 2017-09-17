@@ -1,6 +1,7 @@
 #include "InterruptHandler.h"
 #include <Driver/PIC/PIC.h>
 #include <Console/Console.h>
+#include <Scheduling/Scheduler.h>
 void __DebugIntOutput(int _Vector, int _Count)
 {
     char Buffer[] = "[INT:  ,  ]";
@@ -47,4 +48,17 @@ void KeyboardInterruptHandler(int _Vector)
     }
     
     SendPIC_EOI(_Vector - PIC_IRQ_VECTOR);
+}
+
+void TimerInterruptHandler(int _Vector)
+{
+
+    SendPIC_EOI(_Vector - PIC_IRQ_VECTOR);
+
+    DecreaseProcessorTime();
+    if(IsProcessorTimeExpired())
+    {
+        ScheduleInInterrupt();    
+    }
+    
 }

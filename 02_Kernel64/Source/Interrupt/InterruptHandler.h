@@ -6,6 +6,6 @@
 void DefaultExceptionHandler(int _Vector, QWORD _ErrorCode);
 void DefaultInterruptHandler(int _Vector);
 void KeyboardInterruptHandler(int _Vector);
-
+void TimerInterruptHandler(int _Vector);
 
 #endif /*__INTERRUPT_HANDLER_H__*/

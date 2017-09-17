@@ -2,9 +2,9 @@
 #define __TASK_H__
 
 #include <Types.h>
-
+#include <GDS/LinkedList.h>
 //SS, RSP, RFLAGS, CS, RIP.. 등등 Context
-#define CONTEXT_REGISTER_COUNT     25
+#define CONTEXT_REGISTER_COUNT     24
 #define CONTEXT_REGISTER_SIZE       8
 
 #define CONTEXT_OFFSET_GS           0
@@ -33,17 +33,18 @@
 #define CONTEXT_OFFSET_SS           23
 
 #define TASK_TCBPOOL_ADDRESS        0x800000
-#define TASK_TCBPOOL_COUNT          0x4096
+#define TASK_TCBPOOL_COUNT          4096
 
 #define TASK_STACK_ADRESS           (TASK_TCBPOOL_ADDRESS + sizeof(TCB) * TASK_TCBPOOL_COUNT)
-#define TASK_STACK_SIZE             8192;
+#define TASK_STACK_SIZE             8192
 
 #define TASK_INVALID_ID             0xFFFFFFFFFFFFFFFF
 
-#define TASK_TIME                   5
+#define TASK_FREE                   0x0000000000000000
+#define TASK_ALLOCATED              0x0100000000000000
 
-#define TASK_FREE                   0x0
-#define TASK_ALLOCATED              0x1
+#define TASK_STATE_MASK             0xFF00000000000000
+#define TASK_INDEX_MASK             0x00FFFFFFFFFFFFFF
 
 
 #pragma pack(push,1)
@@ -62,7 +63,7 @@ typedef struct __TCB_STRUCT
 
     void*               StackAddress;
     QWORD               StackSize;
-} TCB;
+} TCB;  
 
 //Management TCB Poll
 typedef struct __TCB_POOL_MANAGER

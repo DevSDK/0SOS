@@ -8,7 +8,7 @@ typedef struct _struct_Single_LinekdListNode
 {
     void* NextNode; //Single Link Linked List
     QWORD ID; //Address or Data
-} LLIST_NODE_HEADER;
+}   LLIST_NODE_HEADER;
 
 /*
     exmple of element data structure.
@@ -33,11 +33,11 @@ typedef struct _struct_LinkedListDescriptor
 
 #pragma pack(pop)
 
-void InitializeLList(const LLIST* _Ld);
+void InitializeLList(LLIST* _Ld);
 
-void Push_Back_LList(const LLIST* _Ld, void* _Item);
-void Push_Front_LList(const LLIST* _Ld, void* _Item);
-void* Remove_LList(const LLIST* _Ld, QWORD _ID);
+void Push_Back_LList(LLIST* _Ld, void* _Item);
+void Push_Front_LList(LLIST* _Ld, void* _Item);
+void* Remove_LList(LLIST* _Ld, QWORD _ID);
 void* Remove_Front_LList(const LLIST* _Ld);
 void* Remove_Back_LList(const LLIST* _Ld);
 
