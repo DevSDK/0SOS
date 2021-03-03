@@ -1,5 +1,9 @@
 # Summary
 
+This project is made to understand how the operating system work.
+ 
+The sources are based on "64비트 멀티코어OS 원리와 구조" by Seunghun Han.
+
 The Operating System on x86_64 Architecture.
 
 This source tree will be used to learn about the foundation and internal of Operating Systems.
