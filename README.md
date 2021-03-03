@@ -2,7 +2,7 @@
 
 This project is made to understand how the operating system work.
  
-The sources are based on "[64비트 멀티코어OS 원리와 구조](http://www.yes24.com/Product/Goods/65061299)" by Seunghun Han.
+The sources are referred from "[64비트 멀티코어OS 원리와 구조](http://www.yes24.com/Product/Goods/65061299)" by Seunghun Han.
 
 The Operating System on x86_64 Architecture.
 
